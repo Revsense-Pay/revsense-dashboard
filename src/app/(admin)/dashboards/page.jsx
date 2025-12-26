@@ -1,36 +1,32 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = false;
-
 import React from 'react';
-import dynamicImport from 'next/dynamic';
-import Footer from '@/components/layout/Footer';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import IconifyIcon from '@/components/wrapper/IconifyIcon';
 import { Col, Row } from 'react-bootstrap';
+
+import Footer from '@/components/layout/Footer';
+import IconifyIcon from '@/components/wrapper/IconifyIcon';
 import { dashboardData } from './data/dashboardData';
 
 // 🔐 ROUTE PROTECTION
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 
-const RevenueCards = dynamicImport(
-  () => import('./components/RevenueCards'),
-  { ssr: false }
-);
+// ✅ Dynamically load browser-only components
+const RevenueCards = dynamic(() => import('./components/RevenueCards'), {
+  ssr: false,
+});
 
-const ChargesChart = dynamicImport(
-  () => import('./components/ChargesChart'),
-  { ssr: false }
-);
+const ChargesChart = dynamic(() => import('./components/ChargesChart'), {
+  ssr: false,
+});
 
-const RecentCharges = dynamicImport(
-  () => import('./components/RecentCharges'),
-  { ssr: false }
-);
+const RecentCharges = dynamic(() => import('./components/RecentCharges'), {
+  ssr: false,
+});
 
 const Page = () => {
-  // 👇 route guard MUST run before render
+  // 👇 client-side auth guard
   useRequireAuth();
 
   return (
@@ -43,15 +39,8 @@ const Page = () => {
               <li className="breadcrumb-item">
                 <Link href="/">Revsense</Link>
               </li>
-              <div
-                className="mx-1"
-                style={{ height: 24, paddingRight: '8px' }}
-              >
-                <IconifyIcon
-                  icon="bx:chevron-right"
-                  height={16}
-                  width={16}
-                />
+              <div className="mx-1" style={{ height: 24, paddingRight: 8 }}>
+                <IconifyIcon icon="bx:chevron-right" height={16} width={16} />
               </div>
               <li className="breadcrumb-item active">Dashboard</li>
             </ol>
