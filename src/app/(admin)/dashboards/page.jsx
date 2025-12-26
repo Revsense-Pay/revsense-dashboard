@@ -5,17 +5,17 @@ export const revalidate = 0;
 
 import Footer from '@/components/layout/Footer';
 import React from 'react';
-import dynamic from 'next/dynamic';
+import dynamicImport from 'next/dynamic';
 
-const RevenueCards = dynamic(() => import('./components/RevenueCards'), {
+const RevenueCards = dynamicImport(() => import('./components/RevenueCards'), {
   ssr: false,
 });
 
-const ChargesChart = dynamic(() => import('./components/ChargesChart'), {
+const ChargesChart = dynamicImport(() => import('./components/ChargesChart'), {
   ssr: false,
 });
 
-const RecentCharges = dynamic(() => import('./components/RecentCharges'), {
+const RecentCharges = dynamicImport(() => import('./components/RecentCharges'), {
   ssr: false,
 });
 import Link from 'next/link';
