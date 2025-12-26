@@ -29,8 +29,8 @@ const SignIn = () => {
 
   const { handleSubmit, control } = useForm({
     defaultValues: {
-      email: 'demo@gmail.com',
-      password: '123456',
+      email: '',
+      password: '',
     },
     resolver: yupResolver(schema),
   });
@@ -46,37 +46,36 @@ const SignIn = () => {
           <Col md={6} lg={5}>
             <Card className="border-0 shadow-lg">
               <CardBody className="p-5">
-                <div className="text-center mb-4 auth-logo">
-                  <Link href="/" className="logo-dark d-inline-block">
-                    <Image src={DarkLogo} height={32} alt="logo dark" />
-                  </Link>
+                <div className="text-center">
+                  <div className="mx-auto mb-4 auth-logo">
+                    <Link href="/" className="logo-dark">
+                      <Image src={DarkLogo} height={32} alt="Revsense logo dark" />
+                    </Link>
 
-                  <Link href="/" className="logo-light d-inline-block">
-                    <Image src={LightLogo} height={28} alt="logo light" />
-                  </Link>
+                    <Link href="/" className="logo-light">
+                      <Image src={LightLogo} height={28} alt="Revsense logo light" />
+                    </Link>
+                  </div>
+
+                  <h4 className="fw-bold mb-2">Welcome Back</h4>
+                  <p className="text-muted">Sign in to your account</p>
                 </div>
-
-                <h4 className="fw-bold text-dark mb-2 text-center">
-                  Welcome Back!
-                </h4>
-                <p className="text-muted text-center">
-                  Sign in to your account to continue
-                </p>
 
                 <form onSubmit={handleSubmit(handleLogin)} className="mt-4">
                   <div className="mb-3">
                     <TextFormInput
                       control={control}
                       name="email"
-                      placeholder="Enter your email"
                       label="Email Address"
+                      placeholder="Enter your email"
+                      className="form-control"
                     />
                   </div>
 
                   <div className="mb-3">
                     <Link
                       href="/auth/reset-password"
-                      className="float-end text-muted ms-1"
+                      className="float-end text-muted"
                     >
                       Forgot password?
                     </Link>
@@ -84,28 +83,15 @@ const SignIn = () => {
                     <TextFormInput
                       control={control}
                       name="password"
-                      placeholder="Enter your password"
                       label="Password"
+                      placeholder="Enter your password"
+                      className="form-control"
                       type="password"
                     />
                   </div>
 
-                  <div className="form-check mb-3">
-                    <input
-                      type="checkbox"
-                      className="form-check-input"
-                      id="remember-me"
-                    />
-                    <label className="form-check-label" htmlFor="remember-me">
-                      Remember me
-                    </label>
-                  </div>
-
                   <div className="d-grid">
-                    <button
-                      className="btn btn-dark btn-lg fw-medium"
-                      type="submit"
-                    >
+                    <button type="submit" className="btn btn-dark btn-lg">
                       Sign In
                     </button>
                   </div>
@@ -115,10 +101,7 @@ const SignIn = () => {
 
             <p className="text-center mt-4 text-white text-opacity-50">
               Don&apos;t have an account?{' '}
-              <Link
-                href="/auth/sign-up"
-                className="text-decoration-none text-white fw-bold"
-              >
+              <Link href="/auth/sign-up" className="fw-bold text-white">
                 Sign Up
               </Link>
             </p>
