@@ -1,23 +1,11 @@
 'use client';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = false;
 
-import Footer from '@/components/layout/Footer';
 import React from 'react';
 import dynamicImport from 'next/dynamic';
-
-const RevenueCards = dynamicImport(() => import('./components/RevenueCards'), {
-  ssr: false,
-});
-
-const ChargesChart = dynamicImport(() => import('./components/ChargesChart'), {
-  ssr: false,
-});
-
-const RecentCharges = dynamicImport(() => import('./components/RecentCharges'), {
-  ssr: false,
-});
+import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
 import IconifyIcon from '@/components/wrapper/IconifyIcon';
 import { Col, Row } from 'react-bootstrap';
@@ -25,6 +13,21 @@ import { dashboardData } from './data/dashboardData';
 
 // 🔐 ROUTE PROTECTION
 import { useRequireAuth } from '@/hooks/useRequireAuth';
+
+const RevenueCards = dynamicImport(
+  () => import('./components/RevenueCards'),
+  { ssr: false }
+);
+
+const ChargesChart = dynamicImport(
+  () => import('./components/ChargesChart'),
+  { ssr: false }
+);
+
+const RecentCharges = dynamicImport(
+  () => import('./components/RecentCharges'),
+  { ssr: false }
+);
 
 const Page = () => {
   // 👇 route guard MUST run before render
