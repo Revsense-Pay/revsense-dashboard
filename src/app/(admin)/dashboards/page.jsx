@@ -1,5 +1,6 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
 import Footer from '@/components/layout/Footer';
 import React from 'react';
 import ChargesChart from './components/ChargesChart';
