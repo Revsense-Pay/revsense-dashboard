@@ -1,0 +1,72 @@
+//
+// card.scss
+//
+
+.card {
+    margin-bottom: $spacer;
+    transition: all .35s;
+    box-shadow: $box-shadow;
+}
+
+.card-link+.card-link {
+    margin-left: $card-spacer-x;
+    margin-right: 0;
+}
+
+.card-drop {
+    font-size: $h4-font-size;
+    line-height: 0;
+    color: inherit;
+}
+
+.card-height-100 {
+    height: calc(100% - #{$spacer});
+}
+
+
+/* =========================
+   Dashboard Stat Cards
+   ========================= */
+
+.stat-card {
+  border: none;
+  border-radius: 16px;
+  background: var(--bs-body-bg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  transition: all 0.25s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* Icon bubble */
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+/* Gradients */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #ff7a18, #ffb347);
+}
+
+.bg-gradient-success {
+  background: linear-gradient(135deg, #22c55e, #86efac);
+}
+
+.bg-gradient-info {
+  background: linear-gradient(135deg, #0ea5e9, #7dd3fc);
+}
+
+.bg-gradient-warning {
+  background: linear-gradient(135deg, #f59e0b, #fde68a);
+}

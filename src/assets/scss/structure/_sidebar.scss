@@ -1,0 +1,266 @@
+//
+// _vertical.scss
+//
+
+/* =====================================================
+   LOGO — SINGLE SOURCE OF TRUTH (FINAL)
+   ===================================================== */
+
+.logo-box {
+  position: sticky;
+  top: 0;
+  height: $topbar-height;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $sidebar-bg;
+  border-bottom: 1px solid $sidebar-border-color;
+  z-index: 1020;
+}
+
+/* Expanded sidebar → large logo */
+.app-sidebar {
+  .logo-lg {
+    display: block;
+    height: $logo-lg-height;
+  }
+
+  .logo-sm {
+    display: none;
+    height: 30px;
+    width: auto;
+  }
+}
+
+/* Collapsed sidebar → small logo */
+html[data-sidebar-size='condensed'],
+html[data-sidebar-size='sm-hover'],
+html[data-sidebar-size='sm-hover-active'] {
+  .app-sidebar {
+    width: $sidebar-width-sm;
+    min-width: $sidebar-width-sm;
+
+    .logo-box {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .logo-lg {
+      display: none !important;
+    }
+
+    .logo-sm {
+      display: block !important;
+      margin: 0 auto;
+    }
+  }
+}
+
+/* =====================================================
+   LOGO THEME VISIBILITY (CONTRAST-CORRECT)
+   ===================================================== */
+
+/* Dark UI → light logo */
+html[data-bs-theme='dark'],
+html[data-sidebar-color='dark'],
+html[data-sidebar-color='brand'] {
+  .logo-dark {
+    display: none;
+  }
+
+  .logo-light {
+    display: block;
+  }
+}
+
+/* Light UI → dark logo */
+html[data-bs-theme='light'] {
+  .logo-light {
+    display: none;
+  }
+
+  .logo-dark {
+    display: block;
+  }
+}
+
+/* =====================================================
+   MAIN SIDEBAR
+   ===================================================== */
+
+.app-sidebar {
+  top: 0;
+  bottom: 0;
+  z-index: 1010;
+  position: fixed;
+  width: $sidebar-width;
+  min-width: $sidebar-width;
+  background: $sidebar-bg;
+  font-family: $font-family-secondary;
+  padding-bottom: $spacer;
+  border-right: $card-border-width solid $sidebar-border-color;
+  border-left: $card-border-width solid $sidebar-border-color;
+
+  .scrollbar {
+    height: calc(100% - $topbar-height);
+  }
+
+  .menu-title {
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: $sidebar-item-color;
+    opacity: 0.6;
+    font-weight: $font-weight-semibold;
+    padding: $sidebar-item-padding-y calc($sidebar-item-padding-x * 1.25);
+    height: 36px;
+  }
+
+  .navbar-nav {
+    margin: 0 15px;
+
+    .nav-item {
+      padding: calc($sidebar-item-padding-y * 0.1) 0;
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-radius: 8px;
+        padding: $sidebar-item-padding-y $sidebar-item-padding-x;
+        color: $sidebar-item-color;
+        transition: all 0.25s ease;
+
+        &.active,
+        &:hover {
+          color: $sidebar-item-hover-color;
+        }
+
+        &.active {
+          background-color: $sidebar-item-hover-bg;
+          font-weight: $font-weight-medium;
+        }
+
+        .nav-icon {
+          font-size: $sidebar-item-icon-size;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .badge {
+          margin-left: auto;
+        }
+      }
+    }
+  }
+}
+
+/* =====================================================
+   CONDENSED SIDEBAR BEHAVIOUR
+   ===================================================== */
+
+html[data-sidebar-size='condensed'] {
+  .navbar-nav {
+    padding: 10px;
+    margin: 0;
+
+    .nav-link {
+      justify-content: center;
+
+      .nav-text,
+      .menu-arrow {
+        display: none;
+      }
+    }
+  }
+
+  .app-topbar {
+    padding-left: $sidebar-width-sm;
+  }
+
+  .page-content {
+    margin-left: $sidebar-width-sm;
+  }
+}
+
+/* =====================================================
+   ACTIVE SIDEBAR ITEM — GRADIENT
+   ===================================================== */
+
+.side-nav .nav-item .nav-link {
+  position: relative;
+  border-radius: 10px;
+}
+
+.side-nav .nav-item.active > .nav-link {
+  background: linear-gradient(
+    135deg,
+    #ff2600 0%,
+    #ff009d 50%,
+    #b48cff 100%
+  );
+  color: #fff !important;
+}
+
+.side-nav .nav-item.active > .nav-link i,
+.side-nav .nav-item.active > .nav-link svg {
+  color: #fff !important;
+  filter: drop-shadow(0 0 6px rgba(180, 140, 255, 0.6));
+}
+
+.side-nav .nav-item.active > .nav-link::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: inherit;
+  filter: blur(12px);
+  opacity: 0.35;
+  z-index: -1;
+}
+
+/* =====================================================
+   FINAL ALIGNMENT FIX (logo + MENU + icons)
+   ===================================================== */
+
+html[data-sidebar-size='condensed'],
+html[data-sidebar-size='sm-hover'],
+html[data-sidebar-size='sm-hover-active'] {
+
+  .app-sidebar {
+
+    /* Kill sidebar inner horizontal offsets */
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+
+    /* LOGO */
+    .logo-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 !important;
+    }
+
+    /* MENU + NAV */
+    .navbar-nav {
+      margin: 0 !important;
+      padding: 10px 0 !important;
+    }
+
+    .menu-title {
+      text-align: center;
+      padding: 0 !important;
+      margin: 8px 0 4px 0;
+      font-size: 10px;
+      opacity: 0.5;
+    }
+
+    /* ICON LINKS */
+    .nav-link {
+      justify-content: center !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+  }
+}

@@ -1,0 +1,209 @@
+//
+// app.scss
+//
+
+// Core files
+@import "./node_modules/bootstrap/scss/functions";
+@import "./node_modules/bootstrap/scss/variables";
+@import 'gridjs/dist/theme/mermaid.css';
+
+
+@import "config/variables";
+@import "config/variables-dark";
+@import "config/theme-mode";
+
+@import "./node_modules/bootstrap/scss/bootstrap";
+
+// Structure
+@import "structure/general";
+@import "structure/topbar";
+@import "structure/sidebar";
+@import "structure/footer";
+@import "structure/page-title";
+
+// Bootstrap
+@import "components/accordion";
+@import "components/alerts";
+@import "components/avatar";
+@import "components/backgrounds";
+@import "components/badge";
+@import "components/breadcrumb";
+@import "components/buttons";
+@import "components/card";
+@import "components/dropdown";
+@import "components/forms";
+@import "components/helper";
+@import "components/list-group";
+@import "components/modal";
+@import "components/nav";
+@import "components/pagination";
+@import "components/popover";
+@import "components/print";
+@import "components/progress";
+@import "components/reboot";
+@import "components/switch";
+@import "components/tables";
+@import "components/type";
+@import "components/tooltip";
+@import "components/widgets";
+
+
+// Plugin
+@import "plugins/simplebar";
+@import "plugins/dropzone";
+@import "plugins/editors";
+@import "plugins/gridjs";
+@import "plugins/apexcharts";
+@import "plugins/google-map";
+@import "plugins/vector-map";
+@import "plugins/flatpicker";
+
+// Pages
+@import "pages/icon-demo";
+@import "pages/authentication";
+@import "pages/custom-react";
+
+/* =========================
+   Logo sizing & alignment
+   ========================= */
+
+.logo-box {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 60px;
+
+  /* fine-tuned alignment */
+  padding-left: 32px;
+  padding-right: 24px;
+}
+
+.logo-box a {
+  display: flex;
+  align-items: center;
+}
+
+.logo-lg {
+  height: 28px;
+  width: auto;
+}
+
+.logo-sm {
+  height: 28px;
+  width: auto;
+}
+
+/* === Sidebar collapsed logo (favicon) FINAL FIX === */
+body[data-sidebar-size="sm"] {
+
+  .logo-box {
+    height: 60px;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-box a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Target NEXT/IMAGE wrapper span */
+  .logo-box a > span {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(1px) translateY(1px);
+  }
+
+  .logo-box img.logo-sm {
+    width: 36px;
+    height: 36px;
+    display: block;
+  }
+}
+
+/* =========================
+   Gradient Primary Button
+   ========================= */
+
+.btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: transparent;
+
+  background-image: linear-gradient(
+    135deg,
+    #f97316 0%,   // orange
+    #ef4444 100%  // red
+  );
+
+  border: none;
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.25);
+  transition: all 0.25s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 26px rgba(239, 68, 68, 0.35);
+    filter: brightness(1.05);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 6px 14px rgba(239, 68, 68, 0.25);
+    filter: brightness(0.98);
+  }
+
+  &:focus-visible {
+    box-shadow:
+      0 0 0 4px rgba(249, 115, 22, 0.35),
+      0 8px 20px rgba(239, 68, 68, 0.25);
+  }
+}
+
+.btn-secondary {
+  background-color: #f1f5f9;
+  color: #334155;
+  border: none;
+
+  &:hover {
+    background-color: #e2e8f0;
+  }
+}
+
+/* Onboarding header logo – no sidebar styles */
+.onboarding-logo {
+  padding: 0;
+  line-height: 1;
+  background: transparent;
+}
+
+.onboarding-logo img {
+  display: block;
+  height: 28px;
+}
+
+.paystack-logo {
+  display: flex;
+  justify-content: center;
+}
+
+/* Default: light mode */
+.paystack-logo .logo-dark {
+  display: block;
+}
+.paystack-logo .logo-light {
+  display: none;
+}
+
+/* Dark mode */
+html[data-bs-theme='dark'] {
+  .paystack-logo .logo-dark {
+    display: none;
+  }
+  .paystack-logo .logo-light {
+    display: block;
+  }
+}
