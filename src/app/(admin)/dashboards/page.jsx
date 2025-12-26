@@ -1,14 +1,26 @@
 'use client';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import Footer from '@/components/layout/Footer';
 import React from 'react';
-import ChargesChart from './components/ChargesChart';
-import RecentCharges from './components/RecentCharges';
+import dynamic from 'next/dynamic';
+
+const RevenueCards = dynamic(() => import('./components/RevenueCards'), {
+  ssr: false,
+});
+
+const ChargesChart = dynamic(() => import('./components/ChargesChart'), {
+  ssr: false,
+});
+
+const RecentCharges = dynamic(() => import('./components/RecentCharges'), {
+  ssr: false,
+});
 import Link from 'next/link';
 import IconifyIcon from '@/components/wrapper/IconifyIcon';
 import { Col, Row } from 'react-bootstrap';
-import RevenueCards from './components/RevenueCards';
 import { dashboardData } from './data/dashboardData';
 
 // 🔐 ROUTE PROTECTION
