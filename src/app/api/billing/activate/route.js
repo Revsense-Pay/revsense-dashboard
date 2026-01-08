@@ -1,6 +1,6 @@
 // src/app/api/billing/activate/route.js
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
+import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { v4 as uuid } from 'uuid';
