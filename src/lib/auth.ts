@@ -8,6 +8,7 @@ export const authOptions: NextAuthOptions = {
       name: 'Credentials',
       credentials: {
         email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
       },
 
       async authorize(credentials) {
@@ -48,15 +49,6 @@ export const authOptions: NextAuthOptions = {
       (session.user as any).accountId = (token as any).accountId;
       (session.user as any).role = (token as any).role;
       return session;
-    },
-
-    async redirect({ url, baseUrl }) {
-      // Always send admins to dashboards on login
-      if (url === baseUrl || url === `${baseUrl}/`) {
-        return `${baseUrl}/dashboards`;
-      }
-
-      return url.startsWith(baseUrl) ? url : baseUrl;
     },
   },
 };
