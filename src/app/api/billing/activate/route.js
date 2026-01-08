@@ -5,6 +5,8 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { v4 as uuid } from 'uuid';
 
+export const runtime = 'nodejs';
+
 const PAYSTACK_BASE = 'https://api.paystack.co';
 
 export async function POST() {
