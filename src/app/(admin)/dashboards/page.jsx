@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import React from 'react';
 import { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
+import dynamicImport from 'next/dynamic';
 import Link from 'next/link';
 import { Col, Row } from 'react-bootstrap';
 
@@ -15,15 +15,15 @@ import IconifyIcon from '@/components/wrapper/IconifyIcon';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 
 // ✅ Dynamically load browser-only components
-const RevenueCards = dynamic(() => import('./components/RevenueCards'), {
+const RevenueCards = dynamicImport(() => import('./components/RevenueCards'), {
   ssr: false,
 });
 
-const ChargesChart = dynamic(() => import('./components/ChargesChart'), {
+const ChargesChart = dynamicImport(() => import('./components/ChargesChart'), {
   ssr: false,
 });
 
-const RecentCharges = dynamic(() => import('./components/RecentCharges'), {
+const RecentCharges = dynamicImport(() => import('./components/RecentCharges'), {
   ssr: false,
 });
 
