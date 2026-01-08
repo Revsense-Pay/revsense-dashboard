@@ -5,6 +5,8 @@ import { prisma } from '@/lib/prisma'
 import { decrypt } from '@/lib/crypto'
 import axios from 'axios'
 
+export const runtime = 'nodejs'
+
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions)
