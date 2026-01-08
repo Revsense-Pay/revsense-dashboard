@@ -1,54 +1,69 @@
-import type { NextAuthOptions } from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import { prisma } from '@/lib/prisma';
+import { DefaultSession } from 'next-auth'
+import { JWT } from 'next-auth/jwt'
+
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      accountId: string
+      role: string
+    } & DefaultSession['user']
+  }
+
+  interface User {
+    accountId: string
+    role: string
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    accountId?: string
+    role?: string
+  }
+}
+
+import type { NextAuthOptions } from 'next-auth'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import { prisma } from '@/lib/prisma'
 
 export const authOptions: NextAuthOptions = {
+  session: { strategy: 'jwt' },
   providers: [
     CredentialsProvider({
-      name: 'Credentials',
+      name: 'credentials',
       credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
+        email: { type: 'email' },
+        password: { type: 'password' },
       },
-
       async authorize(credentials) {
-        if (!credentials?.email) return null;
-
+        if (!credentials?.email) return null
         const account = await prisma.account.findUnique({
           where: { email: credentials.email },
-        });
-
-        if (!account) return null;
-
+        })
+        if (!account) return null
         return {
           id: account.id,
           email: account.email,
           accountId: account.id,
           role: account.role,
-        };
+        }
       },
     }),
   ],
-
-  session: {
-    strategy: 'jwt',
-  },
-
-  secret: process.env.NEXTAUTH_SECRET,
-
   callbacks: {
-    async jwt({ token, user }) {
+    jwt({ token, user }) {
       if (user) {
-        (token as any).accountId = (user as any).accountId;
-        (token as any).role = (user as any).role;
+        token.accountId = (user as any).accountId
+        token.role = (user as any).role
       }
-      return token;
+      return token
     },
-
-    async session({ session, token }) {
-      (session.user as any).accountId = (token as any).accountId;
-      (session.user as any).role = (token as any).role;
-      return session;
+    session({ session, token }) {
+      if (session.user) {
+        session.user.accountId = token.accountId as string
+        session.user.role = token.role as string
+      }
+      return session
     },
   },
-};
+}
