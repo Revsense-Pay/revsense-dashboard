@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic';
+
 import { useEffect, useState } from 'react'
 import { Button, Modal } from 'react-bootstrap'
 import { Card, CardBody, CardHeader, Row, Col, Table, Spinner } from 'react-bootstrap'

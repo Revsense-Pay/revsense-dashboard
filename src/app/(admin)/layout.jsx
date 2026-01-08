@@ -1,7 +1,3 @@
-'use client';
-
-export const dynamic = 'force-dynamic';
-
 import Footer from '@/components/layout/Footer';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
