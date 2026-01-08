@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { REVSENSE_USAGE_FEE_PERCENT } from '@/lib/billing/config'
 
+export const runtime = 'nodejs'
+
 export async function GET() {
   const session = await getServerSession(authOptions)
 
