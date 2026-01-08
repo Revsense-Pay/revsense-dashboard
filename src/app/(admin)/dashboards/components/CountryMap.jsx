@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import WorldVectorMap from '@/components/VectorMap/WorldMap';
 import IconifyIcon from '@/components/wrapper/IconifyIcon';
 import React from 'react';

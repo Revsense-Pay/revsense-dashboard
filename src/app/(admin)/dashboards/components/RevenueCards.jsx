@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useCountUp } from '@/hooks/useCountUp';
 import { Card, CardBody, Col, Row } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrapper/IconifyIcon';

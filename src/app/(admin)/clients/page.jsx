@@ -11,6 +11,8 @@
 // --status-pending-text
 // --status-pending-glow
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from 'react';
 import { Button, Alert, Form, Modal } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrapper/IconifyIcon';
