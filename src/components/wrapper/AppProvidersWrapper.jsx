@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { SessionProvider } from 'next-auth/react';
 import { ToastContainer } from 'react-toastify';
 import dynamic from 'next/dynamic';
@@ -12,8 +13,22 @@ const LayoutProvider = dynamic(
 );
 
 const AppProvidersWrapper = ({ children }) => {
+  useEffect(() => {
+    const html = document.documentElement;
+
+    // 🔒 FORCE DARK MODE GLOBALLY
+    html.setAttribute('data-bs-theme', 'dark');
+    html.setAttribute('data-topbar-color', 'dark');
+    html.setAttribute('data-sidebar-color', 'dark');
+    html.setAttribute('data-sidebar-size', 'lg');
+  }, []);
+
   return (
-    <SessionProvider>
+    <SessionProvider
+      refetchOnWindowFocus={false}
+      refetchWhenOffline={false}
+      refetchInterval={0}
+    >
       <LayoutProvider>
         <NotificationProvider>
           <OnboardingProvider>

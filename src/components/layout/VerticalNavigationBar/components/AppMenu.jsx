@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { Collapse } from 'react-bootstrap';
+import { useSession } from 'next-auth/react';
 const MenuItemWithChildren = ({
   item,
   className,
@@ -77,21 +78,24 @@ const MenuItemLink = ({
 const AppMenu = ({
   menuItems
 }) => {
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === 'ADMIN';
+  const visibleMenuItems = isAdmin ? menuItems : (menuItems || []).filter(item => item.key !== 'admin');
   const pathname = usePathname();
   const [activeMenuItems, setActiveMenuItems] = useState([]);
   const toggleMenu = (menuItem, show) => {
-    if (show) setActiveMenuItems([menuItem.key, ...findAllParent(menuItems, menuItem)]);
+    if (show) setActiveMenuItems([menuItem.key, ...findAllParent(visibleMenuItems, menuItem)]);
   };
   const getActiveClass = useCallback(item => {
     return activeMenuItems?.includes(item.key) ? 'active' : '';
   }, [activeMenuItems]);
   const activeMenu = useCallback(() => {
     const trimmedURL = pathname?.replaceAll('', '');
-    const matchingMenuItem = getMenuItemFromURL(menuItems, trimmedURL);
+    const matchingMenuItem = getMenuItemFromURL(visibleMenuItems, trimmedURL);
     if (matchingMenuItem) {
-      const activeMt = findMenuItem(menuItems, matchingMenuItem.key);
+      const activeMt = findMenuItem(visibleMenuItems, matchingMenuItem.key);
       if (activeMt) {
-        setActiveMenuItems([activeMt.key, ...findAllParent(menuItems, activeMt)]);
+        setActiveMenuItems([activeMt.key, ...findAllParent(visibleMenuItems, activeMt)]);
       }
       setTimeout(() => {
         const activatedItem = document.querySelector(`#leftside-menu-container .simplebar-content a[href="${trimmedURL}"]`);
@@ -127,14 +131,14 @@ const AppMenu = ({
         animateScroll();
       };
     }
-  }, [pathname, menuItems]);
+  }, [pathname, visibleMenuItems]);
   useEffect(() => {
-    if (menuItems && menuItems.length > 0) activeMenu();
-  }, [activeMenu, menuItems]);
+    if (visibleMenuItems && visibleMenuItems.length > 0) activeMenu();
+  }, [activeMenu, visibleMenuItems]);
   return <ul className="navbar-nav " style={{
     textTransform: 'capitalize'
   }}>
-      {(menuItems || []).map((item, idx) => {
+      {(visibleMenuItems || []).map((item, idx) => {
       return <Fragment key={item.key + idx}>
             {item.isTitle ? <li className={clsx('menu-title')}>{item.label}</li> : <>
                 {item.children ? <MenuItemWithChildren item={item} toggleMenu={toggleMenu} className="nav-item" linkClassName={clsx('nav-link', getActiveClass(item))} subMenuClassName="nav sub-navbar-nav" activeMenuItems={activeMenuItems} /> : <MenuItem item={item} linkClassName={clsx('nav-link', getActiveClass(item))} className="nav-item " />}

@@ -1,12 +1,15 @@
-import OnboardingHeader from '@/components/onboarding/OnboardingHeader';
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
+import { authOptions } from '@/lib/auth';
 
-export default function OnboardingLayout({ children }) {
-  return (
-    <>
-      <OnboardingHeader />
-      <main className="container py-4">
-        {children}
-      </main>
-    </>
-  );
+export default async function OnboardingLayout({ children }) {
+  const session = await getServerSession(authOptions);
+
+  // 🔒 Not logged in → signup
+  if (!session) {
+    redirect('/auth/signup');
+  }
+
+  // ✅ Logged in → allow onboarding pages
+  return <>{children}</>;
 }

@@ -64,6 +64,43 @@
 @import "pages/custom-react";
 
 /* =========================
+   Force Dark Mode Layout Fix
+   ========================= */
+
+/* Admin wrapper + page content */
+html[data-bs-theme='dark'] {
+  body,
+  .wrapper,
+  .page-content {
+    background-color: var(--bs-body-bg) !important;
+    color: var(--bs-body-color);
+  }
+
+  /* Kill white Bootstrap containers */
+  .container,
+  .container-fluid {
+    background-color: transparent !important;
+  }
+
+  /* Cards inherit dark background */
+  .card {
+    background-color: var(--card-bg, #1f252b);
+    color: var(--bs-body-color);
+  }
+
+  /* Tables */
+  .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--bs-body-color);
+  }
+
+  .table-light {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--bs-body-color);
+  }
+}
+
+/* =========================
    Logo sizing & alignment
    ========================= */
 
@@ -205,5 +242,153 @@ html[data-bs-theme='dark'] {
   }
   .paystack-logo .logo-light {
     display: block;
+  }
+}
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1f2933;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: #1f2933;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  color: #fff;
+}
+
+.auth-card h2 {
+  margin-bottom: 4px;
+  color: #ffffff;
+  font-weight: 400;
+}
+
+.auth-subtitle {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.auth-input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  border: 1px solid #374151;
+  background: #1f2933;
+  color: #fff;
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: #f97316;
+}
+
+.auth-button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(90deg, #f97316, #ef4444);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-error {
+  margin-top: 6px;
+  margin-bottom: 6px;
+  color: #f87171;
+  font-size: 14px;
+}
+
+.auth-footer {
+  margin-top: 20px;
+  text-align: center;
+  color: #9ca3af;
+}
+
+.auth-footer button {
+  background: none;
+  border: none;
+  color: #fff;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.auth-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.auth-logo {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.auth-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.auth-logo img {
+  transform: translateX(6px); /* 👈 subtle optical correction */
+}
+
+/* =========================
+   HARD BIND DARK MODE SURFACES
+   ========================= */
+
+html[data-bs-theme='dark'] {
+
+  /* Topbar */
+  .topbar,
+  .navbar,
+  .topnav,
+  .topbar-custom {
+    background-color: var(--bs-topbar-bg, #282f36) !important;
+    color: #e5e7eb;
+  }
+
+  /* Sidebar */
+  .leftside-menu,
+  .vertical-menu,
+  .sidebar,
+  .side-nav {
+    background-color: var(--bs-sidebar-bg, #282f36) !important;
+  }
+
+  /* Sidebar items */
+  .side-nav .nav-link,
+  .side-nav .menu-title {
+    color: #cbd5e1;
+  }
+
+  .side-nav .nav-link:hover,
+  .side-nav .nav-link.active {
+    background-color: #303943;
+    color: #ffffff;
+  }
+
+  /* Page wrapper */
+  .wrapper,
+  .page-content {
+    background-color: #1f252b;
   }
 }

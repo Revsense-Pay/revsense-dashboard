@@ -1,26 +1,28 @@
-'use client';
+import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { prisma } from '@/lib/prisma';
 
-import { Button } from 'react-bootstrap';
-import { useRouter } from 'next/navigation';
+export default async function OnboardingStartPage() {
+  const session = await getServerSession(authOptions);
 
-const StartOnboardingPage = () => {
-  const router = useRouter();
+  // Safety: must be logged in
+  if (!session?.user?.accountId) {
+    redirect('/auth/signup');
+  }
 
-  return (
-    <div className="container py-5">
-      <h1 className="mb-3">Welcome to RevSense</h1>
-      <p className="text-muted mb-4">
-        Let’s get your account set up in just a few steps.
-      </p>
+  const accountId = session.user.accountId;
 
-      <Button
-        size="lg"
-        onClick={() => router.push('/onboarding/business')}
-      >
-        Get Started
-      </Button>
-    </div>
-  );
-};
+  // Check Paystack completion
+  const hasPaystack = await prisma.paystackKey.findUnique({
+    where: { accountId },
+  });
 
-export default StartOnboardingPage;
+  // 🔁 Decide next step
+  if (!hasPaystack) {
+    redirect('/dashboards');
+  }
+
+  // ✅ Onboarding complete
+  redirect('/dashboards');
+}

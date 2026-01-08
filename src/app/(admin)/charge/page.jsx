@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCurrencyInput } from '@/hooks/useCurrencyInput';
+import { useSession } from 'next-auth/react';
 import {
   Card,
   CardBody,
@@ -11,33 +12,169 @@ import {
   Form,
   Button,
   Table,
+  Spinner,
 } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrapper/IconifyIcon';
+import { toast } from 'sonner';
 
 const ChargeConsolePage = () => {
   const amount = useCurrencyInput();
-  const [customer, setCustomer] = useState('');
+  const { data: session, status: sessionStatus } = useSession();
+
+  if (sessionStatus === 'loading') {
+    return null;
+  }
+
+  if (session?.user?.billingStatus !== 'ACTIVE') {
+    return (
+      <Row>
+        <Col xl={8} className="mx-auto">
+          <Card>
+            <CardBody className="text-center py-5">
+              <IconifyIcon
+                icon="solar:lock-keyhole-bold"
+                className="fs-1 mb-3 text-warning"
+              />
+              <h4 className="mb-2">Billing not activated</h4>
+              <p className="text-muted mb-4">
+                You need to activate billing before you can charge customers.
+              </p>
+              <Button
+                variant="primary"
+                size="lg"
+                href="https://paystack.shop/pay/627-5pbye6"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Activate Billing
+              </Button>
+            </CardBody>
+          </Card>
+        </Col>
+      </Row>
+    );
+  }
+
+  const [clients, setClients] = useState([]);
+  const [clientId, setClientId] = useState('');
+  const [description, setDescription] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [loadingClients, setLoadingClients] = useState(true);
+  const [recentCharges, setRecentCharges] = useState([]);
+  const [loadingCharges, setLoadingCharges] = useState(true);
+
+  /* ----------------------------------
+     Load chargeable clients
+  ---------------------------------- */
+  useEffect(() => {
+    async function loadClients() {
+      try {
+        const res = await fetch('/api/clients/chargeable');
+        const data = await res.json();
+        setClients(Array.isArray(data) ? data : data.clients || []);
+      } catch {
+        setClients([]);
+      } finally {
+        setLoadingClients(false);
+      }
+    }
+
+    loadClients();
+  }, []);
+
+  const parsedAmount = parseFloat(
+    amount.value.replace(/,/g, '')
+  );
 
   const isChargeDisabled =
-    !amount.rawValue ||
-    amount.rawValue <= 0 ||
-    !customer;
+    loading ||
+    !clientId ||
+    isNaN(parsedAmount) ||
+    parsedAmount <= 0;
+
+  useEffect(() => {
+    async function loadRecentCharges() {
+      try {
+        const res = await fetch('/api/charges/recent');
+        const data = await res.json();
+        setRecentCharges(data.charges || []);
+      } catch {
+        setRecentCharges([]);
+      } finally {
+        setLoadingCharges(false);
+      }
+    }
+
+    loadRecentCharges();
+  }, []);
+
+  /* ----------------------------------
+     Submit charge
+  ---------------------------------- */
+  async function handleCharge() {
+    if (isChargeDisabled) return;
+
+    setLoading(true);
+    const toastId = toast.loading('Charging customer…');
+    let chargeSucceeded = false;
+
+    try {
+      const res = await fetch('/api/charges/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId,
+          amount: Math.round(parsedAmount * 100), // kobo
+          description,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        toast.error(data.error || 'Charge failed', { id: toastId });
+        return;
+      }
+
+      // ✅ Mark success before any UI updates
+      chargeSucceeded = true;
+
+      toast.success('Charge successful', { id: toastId });
+
+      // Reset form
+      amount.reset();
+      setClientId('');
+      setDescription('');
+
+      // Optimistic UI update
+      if (data.charge) {
+        setRecentCharges((prev) => [data.charge, ...prev]);
+      }
+    } catch (err) {
+      // ❌ Only show this if the charge never succeeded
+      if (!chargeSucceeded) {
+        toast.error('Something went wrong while charging', { id: toastId });
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <>
-      {/* PAGE TITLE */}
+      {/* PAGE HEADER */}
       <Row>
         <Col xs={12}>
           <div className="page-title-box">
             <h4 className="mb-1">Charge Console</h4>
             <p className="text-muted mb-0">
-              Charge customers instantly and track transactions in real time.
+              Instantly charge customers using saved Paystack authorizations.
             </p>
           </div>
         </Col>
       </Row>
 
-      {/* MAIN CONTENT */}
+      {/* CONTENT */}
       <Row className="g-4">
         {/* QUICK CHARGE */}
         <Col xl={7}>
@@ -61,7 +198,7 @@ const ChargeConsolePage = () => {
                         transform: 'translateY(-50%)',
                         fontWeight: 600,
                         fontSize: 18,
-                        color: '#6c757d',
+                        color: '#adb5bd',
                         pointerEvents: 'none',
                       }}
                     >
@@ -81,18 +218,28 @@ const ChargeConsolePage = () => {
                   </div>
                 </Form.Group>
 
-                {/* CUSTOMER */}
+                {/* CLIENT */}
                 <Form.Group className="mb-3">
                   <Form.Label>Customer</Form.Label>
-                  <Form.Select
-                    value={customer}
-                    onChange={(e) => setCustomer(e.target.value)}
-                  >
-                    <option value="">Select customer</option>
-                    <option value="john">John Smith</option>
-                    <option value="acme">Acme Holdings</option>
-                    <option value="sarah">Sarah Williams</option>
-                  </Form.Select>
+
+                  {loadingClients ? (
+                    <div className="text-muted small">
+                      <Spinner size="sm" className="me-2" />
+                      Loading customers…
+                    </div>
+                  ) : (
+                    <Form.Select
+                      value={clientId}
+                      onChange={(e) => setClientId(e.target.value)}
+                    >
+                      <option value="">Select customer</option>
+                      {clients.map((client) => (
+                        <option key={client.id} value={client.id}>
+                          {client.name || client.email}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  )}
                 </Form.Group>
 
                 {/* DESCRIPTION */}
@@ -100,7 +247,9 @@ const ChargeConsolePage = () => {
                   <Form.Label>Description (optional)</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="e.g. March retainer, extra usage"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="e.g. Extra usage, March retainer"
                   />
                 </Form.Group>
 
@@ -110,16 +259,17 @@ const ChargeConsolePage = () => {
                   size="lg"
                   disabled={isChargeDisabled}
                   className="w-100 d-flex align-items-center justify-content-center gap-2"
+                  onClick={handleCharge}
                 >
                   <IconifyIcon icon="solar:card-send-bold" />
-                  Charge Now
+                  {loading ? 'Charging…' : 'Charge Now'}
                 </Button>
               </Form>
             </CardBody>
           </Card>
         </Col>
 
-        {/* RECENT CHARGES */}
+        {/* RECENT CHARGES (placeholder – webhook-backed later) */}
         <Col xl={5}>
           <Card className="h-100">
             <CardHeader className="d-flex align-items-center justify-content-between">
@@ -139,33 +289,32 @@ const ChargeConsolePage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>John Smith</td>
-                    <td>R 1,200</td>
-                    <td>
-                      <span className="badge bg-success-subtle text-success">
-                        Success
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Acme Holdings</td>
-                    <td>R 9,800</td>
-                    <td>
-                      <span className="badge bg-success-subtle text-success">
-                        Success
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Sarah Williams</td>
-                    <td>R 450</td>
-                    <td>
-                      <span className="badge bg-warning-subtle text-warning">
-                        Pending
-                      </span>
-                    </td>
-                  </tr>
+                  {loadingCharges ? (
+                    <tr>
+                      <td colSpan={3} className="text-center py-4">
+                        <Spinner size="sm" className="me-2" />
+                        Loading charges…
+                      </td>
+                    </tr>
+                  ) : recentCharges.length === 0 ? (
+                    <tr>
+                      <td colSpan={3} className="text-center text-muted py-4">
+                        No charges yet
+                      </td>
+                    </tr>
+                  ) : (
+                    recentCharges.map((charge) => (
+                      <tr key={charge.id}>
+                        <td>{charge.client?.name || charge.client?.email}</td>
+                        <td>R {(charge.amount / 100).toFixed(2)}</td>
+                        <td>
+                          <span className="badge bg-success">
+                            {charge.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </Table>
             </CardBody>

@@ -1,0 +1,1 @@
+export const REVSENSE_USAGE_FEE_PERCENT = 0.0075

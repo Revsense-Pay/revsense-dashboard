@@ -2,25 +2,45 @@ import Footer from '@/components/layout/Footer';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { Container } from 'react-bootstrap';
-const TopNavigationBar = dynamic(() => import('@/components/layout/TopNavigationBar/page'));
-const VerticalNavigationBar = dynamic(() => import('@/components/layout/VerticalNavigationBar/page'));
-const AdminLayout = ({
-  children
-}) => {
-  return <div className="wrapper">
-      <Suspense>
-        <TopNavigationBar />
+
+import TopNavigationBar from '@/components/layout/TopNavigationBar/page';
+
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
+import { authOptions } from '@/lib/auth';
+
+const VerticalNavigationBar = dynamic(
+  () => import('@/components/layout/VerticalNavigationBar/page'),
+  { ssr: false }
+);
+
+export default async function AdminLayout({ children }) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect('/auth/signup');
+  }
+
+  if (session.user?.role !== 'ADMIN') {
+    redirect('/no-access');
+  }
+
+  return (
+    <div className="wrapper theme-dark" data-bs-theme="dark">
+      <TopNavigationBar />
+
+      <Suspense fallback={null}>
+        <VerticalNavigationBar />
       </Suspense>
-      <VerticalNavigationBar />
+
       <div className="page-content">
         <Container fluid>{children}</Container>
         <Footer />
       </div>
-    </div>;
-};
-export default AdminLayout;
+    </div>
+  );
+}
 
-// app/(admin)/layout.jsx
 export const metadata = {
   title: 'Revsense Dashboard',
 };

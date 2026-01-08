@@ -33,38 +33,42 @@ const RevenueCards = ({ data }) => {
   return (
     <Row className="g-4 mb-4">
       <StatCard
-  title="Revenue"
-  value={data.grossRevenue}
-  subtext="Processed"
-  icon="solar:wallet-bold"
-  gradient="bg-gradient-primary"
-  isCurrency
-/>
+        key={`revenue-${data?.grossRevenue ?? 0}`}
+        title="Revenue"
+        value={data?.grossRevenue ?? 0}
+        subtext="Processed"
+        icon="solar:wallet-bold"
+        gradient="bg-gradient-primary"
+        isCurrency
+      />
 
-<StatCard
-  title="Fees"
-  value={data.feesCollected}
-  subtext="Your earnings"
-  icon="solar:dollar-bold"
-  gradient="bg-gradient-success"
-  isCurrency
-/>
+      <StatCard
+        key={`fees-${data?.feesCollected ?? 0}`}
+        title="Fees"
+        value={data?.feesCollected ?? 0}
+        subtext="Your earnings"
+        icon="solar:dollar-bold"
+        gradient="bg-gradient-success"
+        isCurrency
+      />
 
-<StatCard
-  title="Active Clients"
-  value={data.activeClients}
-  subtext="Billing live"
-  icon="solar:users-group-rounded-bold"
-  gradient="bg-gradient-info"
-/>
+      <StatCard
+        key={`clients-${data?.activeClients ?? 0}`}
+        title="Active Clients"
+        value={data?.activeClients ?? 0}
+        subtext="Billing live"
+        icon="solar:users-group-rounded-bold"
+        gradient="bg-gradient-info"
+      />
 
-<StatCard
-  title="Charges"
-  value={data.totalCharges}
-  subtext="This period"
-  icon="solar:card-bold"
-  gradient="bg-gradient-warning"
-/>
+      <StatCard
+        key={`charges-${data?.totalCharges ?? 0}`}
+        title="Charges"
+        value={data?.totalCharges ?? 0}
+        subtext="This period"
+        icon="solar:card-bold"
+        gradient="bg-gradient-warning"
+      />
     </Row>
   );
 };

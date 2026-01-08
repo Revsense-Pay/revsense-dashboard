@@ -1,37 +1,37 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
 
-  // Example cookies (you'll refine this later)
-  const isLoggedIn = request.cookies.get('session')?.value;
-  const onboardingComplete = request.cookies.get('onboardingComplete')?.value;
-
-  // Public routes
-  if (pathname.startsWith('/onboarding')) {
+  // Ignore Next internals & API routes
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/favicon.ico')
+  ) {
     return NextResponse.next();
   }
 
-  // Root URL → onboarding
-  if (pathname === '/') {
-    return NextResponse.redirect(new URL('/onboarding/start', request.url));
-  }
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
 
-  // Protect dashboard
-  if (pathname.startsWith('/dashboards')) {
-    if (!isLoggedIn) {
-      return NextResponse.redirect(new URL('/onboarding/start', request.url));
+  // 🔒 Not logged in → signup
+  if (!token) {
+    if (!pathname.startsWith('/auth')) {
+      return NextResponse.redirect(
+        new URL('/auth/signup', req.url)
+      );
     }
-
-    if (!onboardingComplete) {
-      return NextResponse.redirect(new URL('/onboarding/business', request.url));
-    }
+    return NextResponse.next();
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/', '/dashboards/:path*'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };

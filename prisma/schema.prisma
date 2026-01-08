@@ -1,0 +1,148 @@
+enum BillingStatus {
+  INACTIVE
+  ACTIVE
+  SUSPENDED
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AccountRole {
+  USER
+  ADMIN
+}
+
+model Account {
+  id           String   @id @default(cuid())
+  companyName  String?
+  email        String   @unique
+  passwordHash String
+  role AccountRole @default(USER)
+  billingStatus        BillingStatus @default(INACTIVE)
+  billingCustomerCode  String?
+  billingAuthCode      String?
+  createdAt    DateTime @default(now())
+
+  paystackKey PaystackKey?
+  clients     Client[]
+  charges     Charge[]
+  usageSnapshots UsageSnapshot[]
+}
+
+model PaystackKey {
+  id                 String   @id @default(cuid())
+  publicKeyEncrypted String
+  secretKeyEncrypted String
+
+  // Reusable Paystack plan (R1/year authorization plan)
+  planCode           String?
+
+  accountId String  @unique
+  account   Account @relation(fields: [accountId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Client {
+  id                    String   @id @default(cuid())
+  name                  String?
+  email                 String
+
+  paystackCustomerCode  String?
+  authorizationCode     String?
+
+  cardLast4             String?
+  cardType              String?
+  bank                  String?
+
+  planCode              String?
+  subscriptionUrl       String?
+
+  status                ClientStatus @default(PENDING)
+
+  accountId             String
+  account               Account @relation(fields: [accountId], references: [id])
+
+  charges               Charge[]
+
+  createdAt             DateTime @default(now())
+
+  @@unique([email, accountId])
+  @@index([accountId])
+}
+
+model Charge {
+  id                 String        @id @default(cuid())
+  amount             Int           // cents
+  currency           String        @default("ZAR")
+  status             ChargeStatus
+  description        String?
+  paystackRef        String?       @unique
+
+  source             ChargeSource  @default(CLIENT)
+
+  clientId           String?
+  client             Client?       @relation(fields: [clientId], references: [id])
+
+  accountId          String
+  account            Account       @relation(fields: [accountId], references: [id])
+
+  createdAt          DateTime      @default(now())
+
+  @@index([clientId])
+  @@index([accountId])
+  @@index([source])
+}
+
+model UsageSnapshot {
+  id            String   @id @default(cuid())
+
+  accountId     String
+  account       Account  @relation(fields: [accountId], references: [id])
+
+  period        String   // e.g. "2026-01"
+
+  grossCents    Int
+  feeCents      Int
+  feePercent    Float
+
+  status        UsageSnapshotStatus @default(DRAFT)
+  chargedAt      DateTime?
+  paystackReference String?
+  chargeId      String?  // Link to Charge when billed
+
+  createdAt     DateTime @default(now())
+
+  @@unique([accountId, period])
+  @@index([accountId])
+}
+
+enum ClientStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  CANCELLED
+}
+
+enum ChargeStatus {
+  SUCCESS
+  FAILED
+  PENDING
+}
+
+enum ChargeSource {
+  CLIENT
+  USAGE
+}
+
+enum UsageSnapshotStatus {
+  DRAFT
+  FINALISED
+  CHARGED
+}

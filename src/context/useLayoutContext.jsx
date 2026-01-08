@@ -21,18 +21,17 @@ const LayoutProvider = ({
   const queryParams = useQueryParams();
   const override = !!(queryParams.layout_theme || queryParams.topbar_theme || queryParams.menu_theme || queryParams.menu_size);
   const INIT_STATE = {
-  theme: queryParams['layout_theme'] ? queryParams['layout_theme'] : 'light',
-  topbarTheme: queryParams['topbar_theme'] ? queryParams['topbar_theme'] : 'light',
+  theme: queryParams['layout_theme'] ? queryParams['layout_theme'] : 'dark',
+  topbarTheme: queryParams['topbar_theme'] ? queryParams['topbar_theme'] : 'dark',
   menu: {
-    theme: queryParams['menu_theme'] ? queryParams['menu_theme'] : 'light',
-    size: 'default', // 🔒 FORCE STATIC SIDEBAR
+    theme: queryParams['menu_theme'] ? queryParams['menu_theme'] : 'dark',
+    size: 'default',
   },
 };
   const [settings, setSettings] = useLocalStorage('__REBACK_NEXT_CONFIG__', INIT_STATE, override);
   const [offcanvasStates, setOffcanvasStates] = useState({
     showThemeCustomizer: false,
-    showActivityStream: false,
-    showBackdrop: false
+    showActivityStream: false
   });
 
   // update settings
@@ -90,6 +89,15 @@ const LayoutProvider = ({
       showActivityStream: !offcanvasStates.showActivityStream
     });
   };
+
+  // close any open offcanvas/backdrop safely
+  const toggleBackdrop = useCallback(() => {
+    setOffcanvasStates({
+      showThemeCustomizer: false,
+      showActivityStream: false,
+    });
+  }, []);
+
   const themeCustomizer = {
     open: offcanvasStates.showThemeCustomizer,
     toggle: toggleThemeCustomizer
@@ -99,15 +107,6 @@ const LayoutProvider = ({
     toggle: toggleActivityStream
   };
 
-  // toggle backdrop
-  const toggleBackdrop = useCallback(() => {
-    const htmlTag = document.getElementsByTagName('html')[0];
-    if (offcanvasStates.showBackdrop) htmlTag.classList.remove('sidebar-enable');else htmlTag.classList.add('sidebar-enable');
-    setOffcanvasStates({
-      ...offcanvasStates,
-      showBackdrop: !offcanvasStates.showBackdrop
-    });
-  }, [offcanvasStates.showBackdrop]);
   useEffect(() => {
     toggleDocumentAttribute('data-bs-theme', settings.theme);
     toggleDocumentAttribute('data-topbar-color', settings.topbarTheme);
@@ -134,9 +133,8 @@ const LayoutProvider = ({
     activityStream,
     toggleBackdrop,
     resetSettings
-  }), [settings, offcanvasStates])}>
+  }), [settings, offcanvasStates, toggleBackdrop])}>
       {children}
-      {offcanvasStates.showBackdrop && <div className="offcanvas-backdrop fade show" onClick={toggleBackdrop} />}
     </ThemeContext.Provider>;
 };
 export { LayoutProvider, useLayoutContext };

@@ -26,7 +26,12 @@
 /* Dark Mode only */
 html[data-bs-theme="dark"],
 [data-bs-theme="dark"] {
+    background-color: #1f252b;
 
+    body {
+        background-color: #1f252b;
+        color: #e5e7eb;
+    }
     --#{$prefix}border-color: #2f3944;
 
     --#{$prefix}light: #{$body-tertiary-bg-dark};
@@ -55,6 +60,7 @@ html[data-sidebar-color="light"] {
 
 /* Sidebar Dark */
 html[data-sidebar-color="dark"] {
+    
     --#{$prefix}sidebar-bg: #393f4a;
     --#{$prefix}sidebar-item-color: #afb9cf;
     --#{$prefix}sidebar-item-hover-bg: #4697ce;

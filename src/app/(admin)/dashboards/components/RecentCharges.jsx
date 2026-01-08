@@ -1,57 +1,23 @@
 'use client';
 
-import { Card, CardBody, CardHeader, Badge, Table } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+import { Card, CardBody, CardHeader, Badge, Table, Spinner } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrapper/IconifyIcon';
 
-const charges = [
-  {
-    id: 1,
-    customer: 'John Smith',
-    amount: 1200,
-    status: 'success',
-    method: 'Card',
-    time: '2 min ago',
-  },
-  {
-    id: 2,
-    customer: 'Acme Holdings',
-    amount: 9800,
-    status: 'success',
-    method: 'Card',
-    time: '1 hour ago',
-  },
-  {
-    id: 3,
-    customer: 'Sarah Williams',
-    amount: 450,
-    status: 'pending',
-    method: 'Debit',
-    time: 'Today',
-  },
-  {
-    id: 4,
-    customer: 'Blue Ocean Ltd',
-    amount: 2300,
-    status: 'failed',
-    method: 'Card',
-    time: 'Yesterday',
-  },
-];
-
 const statusConfig = {
-  success: {
+  SUCCESS: {
     label: 'Success',
     bg: 'success-subtle',
     text: 'success',
     icon: 'solar:check-circle-bold',
   },
-  pending: {
+  PENDING: {
     label: 'Pending',
     bg: 'warning-subtle',
     text: 'warning',
     icon: 'solar:clock-circle-bold',
   },
-  failed: {
+  FAILED: {
     label: 'Failed',
     bg: 'danger-subtle',
     text: 'danger',
@@ -59,58 +25,90 @@ const statusConfig = {
   },
 };
 
+function timeAgo(date) {
+  const diff = Math.floor((Date.now() - new Date(date)) / 1000);
+  if (diff < 60) return 'Just now';
+  if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} hr ago`;
+  return new Date(date).toLocaleDateString();
+}
+
 const RecentCharges = () => {
+  const [charges, setCharges] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/dashboard')
+      .then(r => r.json())
+      .then(data => {
+        setCharges(data.recentCharges || []);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <Card className="h-100">
       <CardHeader className="d-flex align-items-center justify-content-between">
         <h5 className="mb-0">Recent Charges</h5>
-        <span className="text-muted small">Last 24 hours</span>
+        <span className="text-muted small">Live</span>
       </CardHeader>
 
       <CardBody className="p-0">
-        <Table hover responsive className="mb-0 align-middle">
-          <thead className="table-light">
-            <tr>
-              <th>Customer</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th className="text-end">Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {charges.map((charge) => {
-              const status = statusConfig[charge.status];
+        {loading ? (
+          <div className="d-flex justify-content-center py-5">
+            <Spinner />
+          </div>
+        ) : charges.length === 0 ? (
+          <div className="text-center text-muted py-5">
+            No charges yet
+          </div>
+        ) : (
+          <Table hover responsive className="mb-0 align-middle">
+            <thead className="table-light">
+              <tr>
+                <th>Customer</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th className="text-end">Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {charges.map((charge) => {
+                const status = statusConfig[charge.status] || statusConfig.PENDING;
 
-              return (
-                <tr key={charge.id}>
-                  <td>
-                    <div className="fw-semibold">{charge.customer}</div>
-                    <div className="text-muted small">{charge.method}</div>
-                  </td>
+                return (
+                  <tr key={charge.id}>
+                    <td>
+                      <div className="fw-semibold">
+                        {charge.clientName || charge.clientEmail}
+                      </div>
+                      <div className="text-muted small">Card</div>
+                    </td>
 
-                  <td className="fw-semibold">
-                    R {charge.amount.toLocaleString()}
-                  </td>
+                    <td className="fw-semibold">
+                      R {(charge.amount / 100).toLocaleString()}
+                    </td>
 
-                  <td>
-                    <Badge
-                      bg={status.bg}
-                      text={status.text}
-                      className="d-inline-flex align-items-center gap-1 px-2 py-1"
-                    >
-                      <IconifyIcon icon={status.icon} />
-                      {status.label}
-                    </Badge>
-                  </td>
+                    <td>
+                      <Badge
+                        bg={status.bg}
+                        text={status.text}
+                        className="d-inline-flex align-items-center gap-1 px-2 py-1"
+                      >
+                        <IconifyIcon icon={status.icon} />
+                        {status.label}
+                      </Badge>
+                    </td>
 
-                  <td className="text-end text-muted small">
-                    {charge.time}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
+                    <td className="text-end text-muted small">
+                      {timeAgo(charge.createdAt)}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        )}
       </CardBody>
     </Card>
   );

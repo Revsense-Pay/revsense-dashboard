@@ -1,5 +1,9 @@
 import { MENU_ITEMS } from '@/assets/data/menu-items';
-export const getMenuItems = () => {
+export const getMenuItems = ({ isAdmin = false } = {}) => {
+  if (!isAdmin) {
+    return MENU_ITEMS.filter(item => item.key !== 'admin');
+  }
+
   return MENU_ITEMS;
 };
 export const findAllParent = (menuItems, menuItem) => {

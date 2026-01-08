@@ -33,5 +33,11 @@ export const MENU_ITEMS = [
     label: 'Settings',
     icon: 'solar:settings-outline',
     url: '/settings'
+  },
+  {
+    key: 'admin',
+    label: 'Admin',
+    icon: 'solar:shield-check-outline',
+    url: '/usage'
   }
 ]

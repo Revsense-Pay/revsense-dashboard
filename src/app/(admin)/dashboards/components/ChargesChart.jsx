@@ -11,17 +11,19 @@ import {
 import Chart from 'react-apexcharts';
 import { useState, useMemo } from 'react';
 
-const ChargesChart = ({ data }) => {
+const ChargesChart = ({ data = [] }) => {
+  const safeData = Array.isArray(data) ? data : [];
+
   const [range, setRange] = useState('30d');
 
   const series = useMemo(
     () => [
       {
         name: 'Charges (ZAR)',
-        data: data.map(item => item.amount),
+        data: safeData.map(item => item.amount),
       },
     ],
-    [data]
+    [safeData]
   );
 
   const options = useMemo(
@@ -46,7 +48,7 @@ const ChargesChart = ({ data }) => {
       colors: ['#ff7a18'],
       dataLabels: { enabled: false },
       xaxis: {
-        categories: data.map(item => item.day),
+        categories: safeData.map(item => item.day),
         labels: {
           style: { colors: '#9ca3af' },
         },
@@ -66,52 +68,63 @@ const ChargesChart = ({ data }) => {
         },
       },
     }),
-    [data]
+    [safeData]
   );
 
   return (
     <Row className="mb-4">
       <Col xl={12}>
-        <Card>
-          <CardBody>
-            <div className="d-flex align-items-center justify-content-between mb-3">
-              <div>
-                <h5 className="mb-1">Charges Over Time</h5>
-                <small className="text-muted">
-                  Total customer charges processed
-                </small>
+        {safeData.length === 0 ? (
+          <Card>
+            <CardBody>
+              <h5 className="mb-1">Charges Over Time</h5>
+              <small className="text-muted">
+                No charge data for the selected period
+              </small>
+            </CardBody>
+          </Card>
+        ) : (
+          <Card>
+            <CardBody>
+              <div className="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                  <h5 className="mb-1">Charges Over Time</h5>
+                  <small className="text-muted">
+                    Total customer charges processed
+                  </small>
+                </div>
+
+                <ButtonGroup size="sm">
+                  <Button
+                    variant={range === '7d' ? 'primary' : 'outline-secondary'}
+                    onClick={() => setRange('7d')}
+                  >
+                    7D
+                  </Button>
+                  <Button
+                    variant={range === '30d' ? 'primary' : 'outline-secondary'}
+                    onClick={() => setRange('30d')}
+                  >
+                    30D
+                  </Button>
+                  <Button
+                    variant={range === '90d' ? 'primary' : 'outline-secondary'}
+                    onClick={() => setRange('90d')}
+                  >
+                    90D
+                  </Button>
+                </ButtonGroup>
               </div>
 
-              <ButtonGroup size="sm">
-                <Button
-                  variant={range === '7d' ? 'primary' : 'outline-secondary'}
-                  onClick={() => setRange('7d')}
-                >
-                  7D
-                </Button>
-                <Button
-                  variant={range === '30d' ? 'primary' : 'outline-secondary'}
-                  onClick={() => setRange('30d')}
-                >
-                  30D
-                </Button>
-                <Button
-                  variant={range === '90d' ? 'primary' : 'outline-secondary'}
-                  onClick={() => setRange('90d')}
-                >
-                  90D
-                </Button>
-              </ButtonGroup>
-            </div>
-
-            <Chart
-              options={options}
-              series={series}
-              type="area"
-              height={320}
-            />
-          </CardBody>
-        </Card>
+              <Chart
+                options={options}
+                series={series}
+                type="area"
+                height={320}
+              />
+            </CardBody>
+          </Card>
+        )}
       </Col>
     </Row>
   );

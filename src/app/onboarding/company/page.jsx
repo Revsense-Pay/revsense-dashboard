@@ -1,45 +1,65 @@
 'use client';
 
-import { Card, Button, Form } from 'react-bootstrap';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function CompanyOnboarding() {
-  const { createWorkspace } = useAuth();
+export default function CompanyStep() {
   const router = useRouter();
-  const [name, setName] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const submit = (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
-    createWorkspace({
-      name,
-      currency: 'ZAR',
-      industry: 'Agency',
+    setLoading(true);
+
+    const res = await fetch('/api/onboarding/account', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ companyName, email }),
     });
-    router.push('/onboarding/payments');
-  };
+
+    const data = await res.json();
+
+    if (!data.success) {
+      alert('Failed to create account');
+      setLoading(false);
+      return;
+    }
+
+    // Phase 1 only — temporary storage
+    localStorage.setItem('accountId', data.account.id);
+
+    router.push('/onboarding/paystack');
+  }
 
   return (
-    <Card className="mx-auto" style={{ maxWidth: 520 }}>
-      <Card.Body>
-        <h4 className="mb-3">Set up your company</h4>
+    <div style={{ maxWidth: 480 }}>
+      <h2>Company details</h2>
+      <p className="text-muted">Let’s set up your RevSense account</p>
 
-        <Form onSubmit={submit}>
-          <Form.Group className="mb-3">
-            <Form.Label>Company name</Form.Label>
-            <Form.Control
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </Form.Group>
+      <form onSubmit={handleSubmit}>
+        <input
+          className="form-control mb-3"
+          placeholder="Company name"
+          value={companyName}
+          onChange={(e) => setCompanyName(e.target.value)}
+          required
+        />
 
-          <Button type="submit" className="w-100">
-            Continue
-          </Button>
-        </Form>
-      </Card.Body>
-    </Card>
+        <input
+          className="form-control mb-3"
+          placeholder="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+
+        <button className="btn btn-primary" disabled={loading}>
+          {loading ? 'Creating…' : 'Continue'}
+        </button>
+      </form>
+    </div>
   );
 }
