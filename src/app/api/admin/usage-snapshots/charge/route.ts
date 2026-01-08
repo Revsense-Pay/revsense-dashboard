@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { decrypt } from '@/lib/crypto'
+import axios from 'axios'
 
 export async function POST(req: Request) {
   try {
@@ -77,24 +78,30 @@ export async function POST(req: Request) {
       account.paystackKey.secretKeyEncrypted
     )
 
-    const paystack = require('paystack')(paystackSecretKey)
-
-    // 💳 Execute Paystack charge
-    const chargeRes = await paystack.transaction.chargeAuthorization({
-      authorization_code: account.billingAuthCode,
-      email: account.billingCustomerCode,
-      amount: Math.round(snapshot.usageFeeZAR * 100), // kobo
-      currency: 'ZAR',
-      metadata: {
-        type: 'REVSENSE_USAGE',
-        snapshotId: snapshot.id,
-        period: snapshot.period,
+    const chargeRes = await axios.post(
+      'https://api.paystack.co/transaction/charge_authorization',
+      {
+        authorization_code: account.billingAuthCode,
+        email: account.billingCustomerCode,
+        amount: Math.round(snapshot.usageFeeZAR * 100), // kobo
+        currency: 'ZAR',
+        metadata: {
+          type: 'REVSENSE_USAGE',
+          snapshotId: snapshot.id,
+          period: snapshot.period,
+        },
       },
-    })
+      {
+        headers: {
+          Authorization: `Bearer ${paystackSecretKey}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    )
 
-    if (!chargeRes.status) {
+    if (!chargeRes.data?.status) {
       return NextResponse.json(
-        { error: chargeRes.message || 'Charge failed' },
+        { error: chargeRes.data.message || 'Charge failed' },
         { status: 400 }
       )
     }

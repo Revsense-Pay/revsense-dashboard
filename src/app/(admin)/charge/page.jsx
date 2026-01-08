@@ -21,6 +21,59 @@ const ChargeConsolePage = () => {
   const amount = useCurrencyInput();
   const { data: session, status: sessionStatus } = useSession();
 
+  const [clients, setClients] = useState([]);
+  const [clientId, setClientId] = useState('');
+  const [description, setDescription] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [loadingClients, setLoadingClients] = useState(true);
+  const [recentCharges, setRecentCharges] = useState([]);
+  const [loadingCharges, setLoadingCharges] = useState(true);
+
+  /* ----------------------------------
+     Load chargeable clients
+  ---------------------------------- */
+  useEffect(() => {
+    async function loadClients() {
+      try {
+        const res = await fetch('/api/clients/chargeable');
+        const data = await res.json();
+        setClients(Array.isArray(data) ? data : data.clients || []);
+      } catch {
+        setClients([]);
+      } finally {
+        setLoadingClients(false);
+      }
+    }
+
+    loadClients();
+  }, []);
+
+  useEffect(() => {
+    async function loadRecentCharges() {
+      try {
+        const res = await fetch('/api/charges/recent');
+        const data = await res.json();
+        setRecentCharges(data.charges || []);
+      } catch {
+        setRecentCharges([]);
+      } finally {
+        setLoadingCharges(false);
+      }
+    }
+
+    loadRecentCharges();
+  }, []);
+
+  const parsedAmount = parseFloat(
+    amount.value.replace(/,/g, '')
+  );
+
+  const isChargeDisabled =
+    loading ||
+    !clientId ||
+    isNaN(parsedAmount) ||
+    parsedAmount <= 0;
+
   if (sessionStatus === 'loading') {
     return null;
   }
@@ -54,59 +107,6 @@ const ChargeConsolePage = () => {
       </Row>
     );
   }
-
-  const [clients, setClients] = useState([]);
-  const [clientId, setClientId] = useState('');
-  const [description, setDescription] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [loadingClients, setLoadingClients] = useState(true);
-  const [recentCharges, setRecentCharges] = useState([]);
-  const [loadingCharges, setLoadingCharges] = useState(true);
-
-  /* ----------------------------------
-     Load chargeable clients
-  ---------------------------------- */
-  useEffect(() => {
-    async function loadClients() {
-      try {
-        const res = await fetch('/api/clients/chargeable');
-        const data = await res.json();
-        setClients(Array.isArray(data) ? data : data.clients || []);
-      } catch {
-        setClients([]);
-      } finally {
-        setLoadingClients(false);
-      }
-    }
-
-    loadClients();
-  }, []);
-
-  const parsedAmount = parseFloat(
-    amount.value.replace(/,/g, '')
-  );
-
-  const isChargeDisabled =
-    loading ||
-    !clientId ||
-    isNaN(parsedAmount) ||
-    parsedAmount <= 0;
-
-  useEffect(() => {
-    async function loadRecentCharges() {
-      try {
-        const res = await fetch('/api/charges/recent');
-        const data = await res.json();
-        setRecentCharges(data.charges || []);
-      } catch {
-        setRecentCharges([]);
-      } finally {
-        setLoadingCharges(false);
-      }
-    }
-
-    loadRecentCharges();
-  }, []);
 
   /* ----------------------------------
      Submit charge
