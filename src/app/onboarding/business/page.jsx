@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useRouter } from 'next/navigation';
 import { Card, Col, Row, Form, Button } from 'react-bootstrap';
 import { useOnboarding } from '@/context/OnboardingContext';
