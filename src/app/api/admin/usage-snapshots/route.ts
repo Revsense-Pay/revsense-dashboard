@@ -1,3 +1,5 @@
+export const runtime = 'nodejs'
+
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
@@ -7,8 +9,8 @@ import { startOfMonth, format } from 'date-fns'
 export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!session?.user || session.user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     const { searchParams } = new URL(req.url)
@@ -18,15 +20,6 @@ export async function GET(req: Request) {
 
     const snapshots = await prisma.usageSnapshot.findMany({
       where: { period },
-      include: {
-        account: {
-          select: {
-            id: true,
-            email: true,
-            companyName: true,
-          },
-        },
-      },
       orderBy: { createdAt: 'asc' },
     })
 
