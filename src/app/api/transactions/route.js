@@ -4,7 +4,7 @@ export const fetchCache = 'force-no-store'
 export const revalidate = 0
 
 import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 

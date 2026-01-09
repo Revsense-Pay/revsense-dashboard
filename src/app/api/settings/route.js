@@ -3,7 +3,7 @@ export const runtime = 'nodejs'
 export const fetchCache = 'force-no-store'
 export const revalidate = 0
 
-import { getServerSession } from "next-auth"
+import { getServerSession } from 'next-auth/next'
 import { NextResponse } from "next/server"
 import { authOptions } from '@/lib/auth'
 import { prisma } from "@/lib/prisma"
