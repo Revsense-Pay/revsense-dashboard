@@ -5,7 +5,7 @@ import { Container } from 'react-bootstrap';
 
 import TopNavigationBar from '@/components/layout/TopNavigationBar/page';
 
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 
