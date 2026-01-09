@@ -1,5 +1,7 @@
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
+export const fetchCache = 'force-no-store'
+export const revalidate = 0
 
 import { NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin-auth'
@@ -13,7 +15,15 @@ export async function POST(req: Request) {
     const snapshot = await finaliseSnapshot(snapshotId)
 
     return NextResponse.json({ success: true, snapshot })
-  } catch (err) {
-    return NextResponse.json({ error: 'Failed' }, { status: 400 })
+  } catch (err: any) {
+    console.error('[finaliseSnapshot] Error:', err)
+    const message = err?.message || String(err)
+    if (
+      message.includes('Invalid state') ||
+      message.includes('cannot be finalised')
+    ) {
+      return NextResponse.json({ error: message }, { status: 409 })
+    }
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

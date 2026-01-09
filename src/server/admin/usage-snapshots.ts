@@ -25,6 +25,24 @@ export async function finaliseSnapshot(snapshotId: string) {
 }
 
 export async function chargeSnapshot(snapshotId: string) {
+  const snapshot = await prisma.usageSnapshot.findUnique({
+    where: { id: snapshotId },
+  })
+
+  if (!snapshot) {
+    throw new Error('Snapshot not found')
+  }
+
+  // 🔒 Idempotency guard
+  if (snapshot.paystackReference) {
+    throw new Error('Snapshot already charged')
+  }
+
+  // 🔒 State guard
+  if (snapshot.status !== 'FINALISED') {
+    throw new Error('Snapshot must be FINALISED before charging')
+  }
+
   return prisma.usageSnapshot.update({
     where: { id: snapshotId },
     data: {

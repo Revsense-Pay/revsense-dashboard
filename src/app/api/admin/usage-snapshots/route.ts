@@ -1,6 +1,9 @@
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
+export const fetchCache = 'force-no-store'
+export const revalidate = 0
+
 import { NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin-auth'
 import { listSnapshots } from '@/server/admin/usage-snapshots'
@@ -19,6 +22,10 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ period, snapshots })
   } catch (err) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    console.error('ADMIN USAGE SNAPSHOTS ERROR', err)
+    return NextResponse.json(
+      { error: 'Failed to load usage snapshots' },
+      { status: 500 }
+    )
   }
 }

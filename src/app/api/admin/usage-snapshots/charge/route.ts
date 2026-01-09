@@ -13,7 +13,12 @@ export async function POST(req: Request) {
     const snapshot = await chargeSnapshot(snapshotId)
 
     return NextResponse.json({ success: true, snapshot })
-  } catch (err) {
-    return NextResponse.json({ error: 'Failed' }, { status: 400 })
+  } catch (err: any) {
+    console.error('CHARGE SNAPSHOT ERROR', err)
+
+    return NextResponse.json(
+      { error: err.message ?? 'Charge failed' },
+      { status: 409 }
+    )
   }
 }
