@@ -1,38 +1,36 @@
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
-export const fetchCache = 'force-no-store'
-export const revalidate = 0
 
-import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { prisma } from "@/lib/prisma";
+import NextAuth from 'next-auth'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import { prisma } from '@/lib/prisma'
 
 const handler = NextAuth({
-  session: { strategy: "jwt" },
+  session: { strategy: 'jwt' },
   providers: [
     CredentialsProvider({
-      name: "credentials",
+      name: 'credentials',
       credentials: {
-        email: { type: "email" },
-        password: { type: "password" },
+        email: { type: 'email' },
+        password: { type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email) return null;
+        if (!credentials?.email) return null
 
         const account = await prisma.account.findUnique({
           where: { email: credentials.email },
-        });
+        })
 
-        if (!account) return null;
+        if (!account) return null
 
         return {
           id: account.id,
           email: account.email,
           role: account.role,
-        };
+        }
       },
     }),
   ],
-});
+})
 
-export { handler as GET, handler as POST };
+export { handler as GET, handler as POST }
