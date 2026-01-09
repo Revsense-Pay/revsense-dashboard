@@ -6,7 +6,7 @@ export const preferredRegion = 'auto'
 
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
+import { authOptions } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma'
 import { decrypt } from '@/lib/crypto'
 import axios from 'axios'

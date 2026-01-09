@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 export const preferredRegion = 'auto'
 
 import NextAuth from 'next-auth'
-import { authOptions } from '@/lib/auth'
+import { authOptions } from '@/lib/auth-options'
 
 const handler = NextAuth(authOptions)
 

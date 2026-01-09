@@ -4,7 +4,7 @@ export const runtime = 'nodejs'
 // src/app/api/billing/activate/route.js
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
+import { authOptions } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma';
 import { v4 as uuid } from 'uuid';
 
