@@ -5,8 +5,6 @@ import { prisma } from '@/lib/prisma'
 import { decrypt } from '@/lib/crypto'
 import axios from 'axios'
 
-export const runtime = 'nodejs'
-export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request) {
   try {
@@ -138,11 +136,4 @@ export async function POST(req: Request) {
       { status: 500 }
     )
   }
-}
-
-export async function GET() {
-  return NextResponse.json(
-    { error: 'Method Not Allowed' },
-    { status: 405 }
-  )
 }

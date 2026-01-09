@@ -4,8 +4,6 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { startOfMonth, format } from 'date-fns'
 
-export const runtime = 'nodejs'
-export const dynamic = 'force-dynamic'
 
 export async function GET(req: Request) {
   try {
