@@ -3,14 +3,12 @@ export const runtime = 'nodejs'
 
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { getServerSession } from 'next-auth/next'
-// import { authOptions } from '@/lib/auth-options'
 
 export async function POST(req: Request) {
   try {
-    const user = { role: 'ADMIN' }
-
-    if (!user || user.role !== 'ADMIN') {
+    // TEMP: isolate from auth during build
+    const isAdmin = true
+    if (!isAdmin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 

@@ -29,6 +29,20 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // 🔐 Admin-only routes
+  if (pathname.startsWith('/dashboards') ||
+      pathname.startsWith('/usage') ||
+      pathname.startsWith('/clients') ||
+      pathname.startsWith('/transactions') ||
+      pathname.startsWith('/settings')) {
+
+    if (token?.role !== 'ADMIN') {
+      return NextResponse.redirect(
+        new URL('/no-access', req.url)
+      );
+    }
+  }
+
   return NextResponse.next();
 }
 
