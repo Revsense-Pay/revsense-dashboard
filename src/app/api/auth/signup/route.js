@@ -2,9 +2,10 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
 export const revalidate = 0
-import { prisma } from '@/lib/prisma';
-import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
+
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import bcrypt from 'bcryptjs'
 
 export async function POST(req) {
   try {
