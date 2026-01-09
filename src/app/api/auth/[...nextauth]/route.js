@@ -1,39 +1,7 @@
-export const runtime = 'nodejs'
-export const dynamic = 'force-dynamic'
-export const fetchCache = 'force-no-store'
-export const revalidate = 0
-
+// src/app/api/auth/[...nextauth]/route.ts
 import NextAuth from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
-import { prisma } from '@/lib/prisma'
+import { authOptions } from '@/lib/auth-options'
 
-const authOptions = {
-  session: { strategy: 'jwt' },
-  providers: [
-    CredentialsProvider({
-      name: 'credentials',
-      credentials: {
-        email: { type: 'email' },
-        password: { type: 'password' },
-      },
-      async authorize(credentials) {
-        if (!credentials?.email) return null
+const handler = NextAuth(authOptions)
 
-        const account = await prisma.account.findUnique({
-          where: { email: credentials.email },
-        })
-
-        if (!account) return null
-
-        return {
-          id: account.id,
-          email: account.email,
-          role: account.role,
-        }
-      },
-    }),
-  ],
-}
-
-export const GET = NextAuth(authOptions)
-export const POST = NextAuth(authOptions)
+export { handler as GET, handler as POST }
