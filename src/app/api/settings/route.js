@@ -1,7 +1,5 @@
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
-export const fetchCache = 'force-no-store'
-export const revalidate = 0
 
 import { getServerSession } from 'next-auth/next'
 import { NextResponse } from "next/server"
