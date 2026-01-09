@@ -1,9 +1,11 @@
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { REVSENSE_USAGE_FEE_PERCENT } from '@/lib/billing/config'
 
-export const runtime = 'nodejs'
 
 export async function GET() {
   const session = await getServerSession(authOptions)

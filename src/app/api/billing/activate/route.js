@@ -1,11 +1,12 @@
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 // src/app/api/billing/activate/route.js
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { v4 as uuid } from 'uuid';
-
-export const runtime = 'nodejs';
 
 const PAYSTACK_BASE = 'https://api.paystack.co';
 

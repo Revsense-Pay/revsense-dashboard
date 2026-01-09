@@ -1,8 +1,9 @@
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
-
-export const runtime = 'nodejs';
 
 export async function GET() {
   try {

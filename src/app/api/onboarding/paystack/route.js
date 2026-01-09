@@ -1,4 +1,5 @@
-export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
 import axios from 'axios';
 import { NextResponse } from 'next/server';
