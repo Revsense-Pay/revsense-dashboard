@@ -6,8 +6,8 @@ export const revalidate = 0
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth-options'
 import { startOfMonth, format } from 'date-fns'
+import { authOptions } from '@/lib/auth-options'
 
 export async function GET(req: Request) {
   try {

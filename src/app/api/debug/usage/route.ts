@@ -3,8 +3,8 @@ export const runtime = 'nodejs'
 
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth-options'
 import { REVSENSE_USAGE_FEE_PERCENT } from '@/lib/billing/config'
+import { authOptions } from '@/lib/auth-options'
 
 
 export async function GET() {
