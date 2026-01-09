@@ -3,6 +3,13 @@ import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 
+export async function GET() {
+  return NextResponse.json(
+    { error: 'Method Not Allowed' },
+    { status: 405 }
+  )
+}
+
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
