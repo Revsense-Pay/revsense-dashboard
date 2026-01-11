@@ -5,9 +5,6 @@ import { Container } from 'react-bootstrap';
 
 import TopNavigationBar from '@/components/layout/TopNavigationBar/page';
 
-import { getServerSession } from 'next-auth/next';
-import { redirect } from 'next/navigation';
-import { authOptions } from '@/lib/auth';
 
 const VerticalNavigationBar = dynamic(
   () => import('@/components/layout/VerticalNavigationBar/page'),
@@ -15,12 +12,6 @@ const VerticalNavigationBar = dynamic(
 );
 
 export default async function AdminLayout({ children }) {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect('/auth/signup');
-  }
-
   return (
     <div className="wrapper theme-dark" data-bs-theme="dark">
       <TopNavigationBar />
