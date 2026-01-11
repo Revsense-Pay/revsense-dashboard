@@ -9,6 +9,14 @@ const roboto = Roboto({
   weight: ['100', '300', '400', '500', '700', '900'],
 });
 
+export const metadata = {
+  title: {
+    default: 'Revsense',
+    template: '%s · Revsense',
+  },
+  description: 'Usage-based billing and payments with Revsense',
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" data-bs-theme="dark">
