@@ -1,14 +1,18 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth-options';
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ billingStatus: 'INACTIVE' });
+
+  // 🔒 No session → locked
+  if (!session?.user?.email) {
+    return NextResponse.json({ billingStatus: 'INACTIVE' });
+  }
 
   const account = await prisma.account.findUnique({
-    where: { id: session.user.id },
+    where: { email: session.user.email },
     select: { billingStatus: true },
   });
 

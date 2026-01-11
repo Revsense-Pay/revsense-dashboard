@@ -34,7 +34,6 @@ const ChargeConsolePage = () => {
 
   // New states for gating logic
   const [billingStatus, setBillingStatus] = useState(null);
-  const [accountStatus, setAccountStatus] = useState(null);
   const [gateLoading, setGateLoading] = useState(true);
 
   /* ----------------------------------
@@ -77,14 +76,12 @@ const ChargeConsolePage = () => {
   useEffect(() => {
     async function loadBillingStatus() {
       try {
-        const res = await fetch('/api/billing-status');
+        const res = await fetch('/api/account/billing-status');
         const data = await res.json();
 
         setBillingStatus(data.billingStatus || null);
-        setAccountStatus(data.accountStatus || null);
       } catch {
         setBillingStatus(null);
-        setAccountStatus(null);
       } finally {
         setGateLoading(false);
       }
@@ -113,7 +110,7 @@ const ChargeConsolePage = () => {
 
   // Remove old gate: if (session?.user?.billingStatus !== 'ACTIVE')
   // Replace with new gate logic:
-  if (billingStatus !== 'ACTIVE' || accountStatus !== 'ACTIVE') {
+  if (billingStatus !== 'ACTIVE') {
     return (
       <>
         <Row>
