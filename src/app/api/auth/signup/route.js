@@ -1,4 +1,4 @@
-// src/app/api/auth/signup/route.ts
+// src/app/api/auth/signup/route.js
 export const runtime = 'nodejs'
 
 import { NextResponse } from 'next/server'
@@ -35,7 +35,7 @@ export async function POST(req) {
       data: {
         email: normalizedEmail,
         passwordHash,
-        companyName: companyName,
+        companyName,
       },
     })
 
@@ -48,3 +48,5 @@ export async function POST(req) {
     )
   }
 }
+
+export {}
