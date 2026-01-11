@@ -1,6 +1,6 @@
 'use client';
 
-import avatar1 from '@/assets/images/users/avatar-1.png';
+import avatar1 from '@/assets/images/users/avatar-1.jpg';
 import IconifyIcon from '@/components/wrapper/IconifyIcon';
 import Image from 'next/image';
 import { signOut } from 'next-auth/react';
