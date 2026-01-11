@@ -9,11 +9,20 @@ export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.accountId) {
+    if (!session?.user?.email) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const accountId = session.user.accountId;
+    const account = await prisma.account.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
+    });
+
+    if (!account) {
+      return Response.json({ error: 'Account not found' }, { status: 404 });
+    }
+
+    const accountId = account.id;
 
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
