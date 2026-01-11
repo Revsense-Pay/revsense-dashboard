@@ -44,7 +44,8 @@ export async function POST(req) {
       data?.metadata?.accountId ||
       data?.subscription?.metadata?.accountId;
 
-    if (!accountId && eventType !== 'charge.success') {
+    if (!accountId) {
+      console.log('Missing accountId in metadata');
       return NextResponse.json({ received: true });
     }
 
@@ -126,7 +127,12 @@ export async function POST(req) {
     }
 
     // 7️⃣ Upsert client (idempotent)
-    const isChargeSuccess = eventType === 'charge.success';
+    const isActivationEvent = ['charge.success','subscription.create','subscription.enable'].includes(eventType);
+
+    if (!accountId) {
+      console.log('Missing accountId before client upsert');
+      return NextResponse.json({ received: true });
+    }
 
     const client = await prisma.client.upsert({
       where: {
@@ -136,8 +142,8 @@ export async function POST(req) {
         },
       },
       update: {
-        status: 'ACTIVE',
-        ...(authorization?.authorization_code && {
+        ...(isActivationEvent && { status: 'ACTIVE' }),
+        ...(authorization && authorization.authorization_code && {
           authorizationCode: authorization.authorization_code,
         }),
         ...(customer?.customer_code && {
@@ -145,7 +151,7 @@ export async function POST(req) {
         }),
         planCode,
 
-        ...(isChargeSuccess && {
+        ...(isActivationEvent && authorization && {
           cardLast4: authorization.last4 ?? null,
           cardType: authorization.card_type ?? null,
           bank: authorization.bank ?? null,
@@ -156,14 +162,14 @@ export async function POST(req) {
         ...(customer?.customer_code && {
           paystackCustomerCode: customer.customer_code,
         }),
-        ...(authorization?.authorization_code && {
+        ...(authorization && authorization.authorization_code && {
           authorizationCode: authorization.authorization_code,
         }),
-        status: 'ACTIVE',
+        ...(isActivationEvent && { status: 'ACTIVE' }),
         accountId,
         planCode,
 
-        ...(isChargeSuccess && {
+        ...(isActivationEvent && authorization && {
           cardLast4: authorization.last4 ?? null,
           cardType: authorization.card_type ?? null,
           bank: authorization.bank ?? null,
