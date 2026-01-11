@@ -120,6 +120,10 @@ export async function POST(req) {
       },
       body: JSON.stringify({
         email: clientEmail,
+        metadata: {
+          accountId,
+          clientEmail,
+        },
       }),
     });
 
@@ -148,6 +152,10 @@ export async function POST(req) {
         email: clientEmail,
         plan: planCode,
         amount: 100, // R1 authorization charge
+        metadata: {
+          accountId,
+          clientEmail,
+        },
       }),
     });
 
