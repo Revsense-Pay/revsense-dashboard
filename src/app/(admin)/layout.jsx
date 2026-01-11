@@ -5,7 +5,6 @@ import { Container } from 'react-bootstrap';
 
 import TopNavigationBar from '@/components/layout/TopNavigationBar/page';
 
-
 const VerticalNavigationBar = dynamic(
   () => import('@/components/layout/VerticalNavigationBar/page'),
   { ssr: false }

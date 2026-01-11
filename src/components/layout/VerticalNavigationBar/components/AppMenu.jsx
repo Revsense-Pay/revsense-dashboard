@@ -19,7 +19,7 @@ const MenuItemWithChildren = ({
   const [open, setOpen] = useState(activeMenuItems.includes(item.key));
   useEffect(() => {
     setOpen(activeMenuItems.includes(item.key));
-  }, [activeMenuItems, item]);
+  }, [activeMenuItems, item.key]);
   const toggleMenuItem = e => {
     e.preventDefault();
     const status = !open;
@@ -90,12 +90,15 @@ const AppMenu = ({
     return activeMenuItems?.includes(item.key) ? 'active' : '';
   }, [activeMenuItems]);
   const activeMenu = useCallback(() => {
-    const trimmedURL = pathname?.replaceAll('', '');
+    const trimmedURL = pathname;
     const matchingMenuItem = getMenuItemFromURL(visibleMenuItems, trimmedURL);
     if (matchingMenuItem) {
       const activeMt = findMenuItem(visibleMenuItems, matchingMenuItem.key);
       if (activeMt) {
-        setActiveMenuItems([activeMt.key, ...findAllParent(visibleMenuItems, activeMt)]);
+        const nextActive = [activeMt.key, ...findAllParent(visibleMenuItems, activeMt)];
+        setActiveMenuItems(prev =>
+          JSON.stringify(prev) === JSON.stringify(nextActive) ? prev : nextActive
+        );
       }
       setTimeout(() => {
         const activatedItem = document.querySelector(`#leftside-menu-container .simplebar-content a[href="${trimmedURL}"]`);

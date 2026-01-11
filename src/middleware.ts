@@ -7,10 +7,10 @@ export async function middleware(req: NextRequest) {
 
   console.log('MIDDLEWARE PATH:', pathname)
 
-  // Ignore Next internals & API routes
+  // ✅ Never block API routes or Next internals
   if (
-    pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
     pathname === '/favicon.ico'
   ) {
     return NextResponse.next()
@@ -21,24 +21,17 @@ export async function middleware(req: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET,
   })
 
-
-  // Not logged in → signup
+  // 🚪 Not logged in → redirect to signup (except auth pages)
   if (!token) {
     if (!pathname.startsWith('/auth')) {
-      return NextResponse.redirect(
-        new URL('/auth/signup', req.url)
-      )
+      return NextResponse.redirect(new URL('/auth/signup', req.url))
     }
     return NextResponse.next()
   }
 
-  // 🔐 ADMIN-ONLY AREA (ONLY THIS)
-  if (pathname.startsWith('/usage')) {
-    if (token.role !== 'ADMIN') {
-      return NextResponse.redirect(
-        new URL('/no-access', req.url)
-      )
-    }
+  // 🔐 Admin-only routes (ONLY /usage)
+  if (pathname.startsWith('/usage') && token.role !== 'ADMIN') {
+    return NextResponse.redirect(new URL('/no-access', req.url))
   }
 
   return NextResponse.next()
