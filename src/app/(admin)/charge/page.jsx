@@ -72,17 +72,28 @@ const ChargeConsolePage = () => {
     loadRecentCharges();
   }, []);
 
-  // New useEffect to set gating states from session data
+
+  // New useEffect to set gating states from DB via API
   useEffect(() => {
-    if (sessionStatus === 'loading') {
-      return;
+    async function loadBillingStatus() {
+      try {
+        const res = await fetch('/api/billing-status');
+        const data = await res.json();
+
+        setBillingStatus(data.billingStatus || null);
+        setAccountStatus(data.accountStatus || null);
+      } catch {
+        setBillingStatus(null);
+        setAccountStatus(null);
+      } finally {
+        setGateLoading(false);
+      }
     }
-    if (session) {
-      setBillingStatus(session.user?.billingStatus || null);
-      setAccountStatus(session.user?.accountStatus || null);
+
+    if (sessionStatus !== 'loading') {
+      loadBillingStatus();
     }
-    setGateLoading(false);
-  }, [session, sessionStatus]);
+  }, [sessionStatus]);
 
   const parsedAmount = parseFloat(
     amount.value.replace(/,/g, '')
