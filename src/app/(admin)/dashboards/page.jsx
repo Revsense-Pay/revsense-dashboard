@@ -11,9 +11,6 @@ import { Col, Row } from 'react-bootstrap';
 import Footer from '@/components/layout/Footer';
 import IconifyIcon from '@/components/wrapper/IconifyIcon';
 
-// 🔐 ROUTE PROTECTION
-import { useRequireAuth } from '@/hooks/useRequireAuth';
-
 // ✅ Dynamically load browser-only components
 const RevenueCards = dynamicImport(() => import('./components/RevenueCards'), {
   ssr: false,
