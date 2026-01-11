@@ -21,10 +21,6 @@ export default async function AdminLayout({ children }) {
     redirect('/auth/signup');
   }
 
-  if (session.user?.role !== 'ADMIN') {
-    redirect('/no-access');
-  }
-
   return (
     <div className="wrapper theme-dark" data-bs-theme="dark">
       <TopNavigationBar />

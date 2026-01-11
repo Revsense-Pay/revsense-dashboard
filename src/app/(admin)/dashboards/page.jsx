@@ -25,9 +25,6 @@ const RecentCharges = dynamicImport(() => import('./components/RecentCharges'), 
 });
 
 const Page = () => {
-  // 👇 client-side auth guard
-  useRequireAuth();
-
   const [dashboardData, setDashboardData] = useState(null);
 
   useEffect(() => {
