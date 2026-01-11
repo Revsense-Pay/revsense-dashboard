@@ -40,14 +40,7 @@ export async function POST(req) {
     // 3️⃣ Extract planCode BEFORE DB access
     const data = event?.data;
 
-    const accountId =
-      data?.metadata?.accountId ||
-      data?.subscription?.metadata?.accountId;
-
-    if (!accountId) {
-      console.log('Missing accountId in metadata');
-      return NextResponse.json({ received: true });
-    }
+    const customerEmail = data?.customer?.email;
 
     const planCode =
       data?.plan?.plan_code ||
@@ -67,10 +60,20 @@ export async function POST(req) {
 
     let secretKey;
     let paystackKey;
+    let accountId;
 
     if (isPlatformPlan) {
       secretKey = process.env.PAYSTACK_SECRET_KEY;
     } else {
+      accountId =
+        data?.metadata?.accountId ||
+        data?.subscription?.metadata?.accountId;
+
+      if (!accountId) {
+        console.log('Missing accountId in metadata');
+        return NextResponse.json({ received: true });
+      }
+
       paystackKey = await prisma.paystackKey.findUnique({
         where: { accountId },
         select: {
@@ -100,18 +103,23 @@ export async function POST(req) {
     }
 
     // 5️⃣ Handle platform billing block without paystackKey reference
-    if (isPlatformPlan && eventType === 'charge.success') {
-      if (!accountId) {
-        return NextResponse.json(
-          { error: 'Missing accountId in metadata for platform plan' },
-          { status: 400 }
-        );
+    if (
+      isPlatformPlan &&
+      ['charge.success', 'subscription.enable'].includes(eventType)
+    ) {
+      const account = await prisma.account.findUnique({
+        where: { email: customerEmail },
+      });
+
+      if (!account) {
+        return NextResponse.json({ received: true });
       }
 
       await prisma.account.update({
-        where: { id: accountId },
+        where: { id: account.id },
         data: {
           billingStatus: 'ACTIVE',
+          billingCustomerCode: data?.customer?.customer_code ?? null,
         },
       });
 
