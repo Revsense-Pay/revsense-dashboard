@@ -40,6 +40,14 @@ export async function POST(req) {
     // 3️⃣ Extract planCode BEFORE DB access
     const data = event?.data;
 
+    const accountId =
+      data?.metadata?.accountId ||
+      data?.subscription?.metadata?.accountId;
+
+    if (!accountId && eventType !== 'charge.success') {
+      return NextResponse.json({ received: true });
+    }
+
     const planCode =
       data?.plan?.plan_code ||
       data?.subscription?.plan?.plan_code ||
@@ -62,9 +70,8 @@ export async function POST(req) {
     if (isPlatformPlan) {
       secretKey = process.env.PAYSTACK_SECRET_KEY;
     } else {
-      // Lookup paystackKey for signature verification
-      paystackKey = await prisma.paystackKey.findFirst({
-        where: { planCode },
+      paystackKey = await prisma.paystackKey.findUnique({
+        where: { accountId },
         select: {
           accountId: true,
           secretKeyEncrypted: true,
@@ -72,10 +79,7 @@ export async function POST(req) {
       });
 
       if (!paystackKey?.secretKeyEncrypted) {
-        return NextResponse.json(
-          { error: 'Unknown Paystack plan' },
-          { status: 404 }
-        );
+        return NextResponse.json({ received: true });
       }
 
       secretKey = decrypt(paystackKey.secretKeyEncrypted);
@@ -96,7 +100,6 @@ export async function POST(req) {
 
     // 5️⃣ Handle platform billing block without paystackKey reference
     if (isPlatformPlan && eventType === 'charge.success') {
-      const accountId = data?.metadata?.accountId;
       if (!accountId) {
         return NextResponse.json(
           { error: 'Missing accountId in metadata for platform plan' },
@@ -129,7 +132,7 @@ export async function POST(req) {
       where: {
         email_accountId: {
           email: customer.email,
-          accountId: paystackKey.accountId,
+          accountId,
         },
       },
       update: {
@@ -157,7 +160,7 @@ export async function POST(req) {
           authorizationCode: authorization.authorization_code,
         }),
         status: 'ACTIVE',
-        accountId: paystackKey.accountId,
+        accountId,
         planCode,
 
         ...(isChargeSuccess && {
@@ -180,7 +183,7 @@ export async function POST(req) {
           status: 'SUCCESS',
           description: data.metadata?.description ?? null,
           clientId: client.id,
-          accountId: paystackKey.accountId,
+          accountId,
         },
         create: {
           amount: data.amount,
@@ -188,7 +191,7 @@ export async function POST(req) {
           status: 'SUCCESS',
           description: data.metadata?.description ?? null,
           clientId: client.id,
-          accountId: paystackKey.accountId,
+          accountId,
           paystackRef: data.reference,
         },
       });
