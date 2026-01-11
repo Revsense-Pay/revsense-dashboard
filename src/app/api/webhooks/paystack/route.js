@@ -5,7 +5,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { decrypt } from '@/lib/crypto';
 
-const PLATFORM_PLAN_CODE = process.env.REVSENSE_PLATFORM_PLAN_CODE;
+const MONTHLY_PLAN_CODE = process.env.PAYSTACK_MONTHLY_PLAN_CODE;
+const ANNUAL_PLAN_CODE = process.env.PAYSTACK_ANNUAL_PLAN_CODE;
 
 export async function POST(req) {
   try {
@@ -50,12 +51,15 @@ export async function POST(req) {
       return NextResponse.json({ received: true });
     }
 
+    const isPlatformPlan =
+      planCode === MONTHLY_PLAN_CODE || planCode === ANNUAL_PLAN_CODE;
+
     // 4️⃣ Determine secret key BEFORE any DB writes and verify signature
 
     let secretKey;
     let paystackKey;
 
-    if (planCode === PLATFORM_PLAN_CODE) {
+    if (isPlatformPlan) {
       secretKey = process.env.PAYSTACK_SECRET_KEY;
     } else {
       // Lookup paystackKey for signature verification
@@ -91,7 +95,7 @@ export async function POST(req) {
     }
 
     // 5️⃣ Handle platform billing block without paystackKey reference
-    if (planCode === PLATFORM_PLAN_CODE) {
+    if (isPlatformPlan && eventType === 'charge.success') {
       const accountId = data?.metadata?.accountId;
       if (!accountId) {
         return NextResponse.json(
@@ -104,7 +108,6 @@ export async function POST(req) {
         where: { id: accountId },
         data: {
           billingStatus: 'ACTIVE',
-          billingPlanCode: PLATFORM_PLAN_CODE,
         },
       });
 
@@ -115,10 +118,7 @@ export async function POST(req) {
     const authorization = data?.authorization;
     const customer = data?.customer;
 
-    if (
-      !authorization?.authorization_code ||
-      !customer?.email
-    ) {
+    if (!customer?.email) {
       return NextResponse.json({ received: true });
     }
 
@@ -134,8 +134,12 @@ export async function POST(req) {
       },
       update: {
         status: 'ACTIVE',
-        authorizationCode: authorization.authorization_code,
-        paystackCustomerCode: customer.customer_code,
+        ...(authorization?.authorization_code && {
+          authorizationCode: authorization.authorization_code,
+        }),
+        ...(customer?.customer_code && {
+          paystackCustomerCode: customer.customer_code,
+        }),
         planCode,
 
         ...(isChargeSuccess && {
@@ -146,8 +150,12 @@ export async function POST(req) {
       },
       create: {
         email: customer.email,
-        paystackCustomerCode: customer.customer_code,
-        authorizationCode: authorization.authorization_code,
+        ...(customer?.customer_code && {
+          paystackCustomerCode: customer.customer_code,
+        }),
+        ...(authorization?.authorization_code && {
+          authorizationCode: authorization.authorization_code,
+        }),
         status: 'ACTIVE',
         accountId: paystackKey.accountId,
         planCode,

@@ -1,7 +1,6 @@
 import LeftSideBarToggle from './components/LeftSideBarToggle';
 import ProfileDropdown from './components/ProfileDropdown';
 import { Container } from 'react-bootstrap';
-import Notifications from './components/Notifications';
 
 const page = () => {
   return (
@@ -14,7 +13,6 @@ const page = () => {
             </div>
 
             <div className="d-flex align-items-center gap-2">
-              <Notifications />
               <ProfileDropdown />
             </div>
           </div>

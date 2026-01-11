@@ -21,6 +21,13 @@ export async function middleware(req: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
+  // ✅ Logged-in users should not access auth pages
+  if (token && pathname.startsWith('/auth')) {
+    return NextResponse.redirect(
+      new URL('/dashboards', req.url)
+    );
+  }
+
   // 🔒 Not logged in → signup
   if (!token) {
     if (!pathname.startsWith('/auth')) {
@@ -32,12 +39,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // 🔐 Admin-only routes
-  if (pathname.startsWith('/dashboards') ||
-      pathname.startsWith('/usage') ||
-      pathname.startsWith('/clients') ||
-      pathname.startsWith('/transactions') ||
-      pathname.startsWith('/settings')) {
-
+  if (pathname.startsWith('/usage')) {
     if (token?.role !== 'ADMIN') {
       return NextResponse.redirect(
         new URL('/no-access', req.url)

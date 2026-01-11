@@ -15,6 +15,7 @@ import {
   Button,
   Table,
   Spinner,
+  Modal,
 } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrapper/IconifyIcon';
 import { toast } from 'sonner';
@@ -76,37 +77,108 @@ const ChargeConsolePage = () => {
     isNaN(parsedAmount) ||
     parsedAmount <= 0;
 
+  const [showBillingModal, setShowBillingModal] = useState(false);
+
   if (sessionStatus === 'loading') {
     return null;
   }
 
   if (session?.user?.billingStatus !== 'ACTIVE') {
     return (
-      <Row>
-        <Col xl={8} className="mx-auto">
-          <Card>
-            <CardBody className="text-center py-5">
-              <IconifyIcon
-                icon="solar:lock-keyhole-bold"
-                className="fs-1 mb-3 text-warning"
-              />
-              <h4 className="mb-2">Billing not activated</h4>
-              <p className="text-muted mb-4">
-                You need to activate billing before you can charge customers.
-              </p>
-              <Button
-                variant="primary"
-                size="lg"
-                href="https://paystack.shop/pay/627-5pbye6"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Activate Billing
-              </Button>
-            </CardBody>
-          </Card>
-        </Col>
-      </Row>
+      <>
+        <Row>
+          <Col xl={8} className="mx-auto">
+            <Card>
+              <CardBody className="text-center py-5">
+                <IconifyIcon
+                  icon="solar:lock-keyhole-bold"
+                  className="fs-1 mb-3 text-warning"
+                />
+                <h4 className="mb-2">Billing not activated</h4>
+                <p className="text-muted mb-4">
+                  Choose a billing plan to activate charging.
+                </p>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  onClick={() => setShowBillingModal(true)}
+                >
+                  Activate Billing
+                </Button>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+
+        <Modal show={showBillingModal} onHide={() => setShowBillingModal(false)} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>Choose a billing plan</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p className="text-center mb-4">
+              Select how you’d like to pay the Revsense platform fee.
+            </p>
+
+            <Row className="g-4">
+              <Col md={6}>
+                <Card className="h-100 border border-warning text-white">
+                  <CardBody className="d-flex flex-column text-white">
+                    <h5 className="mb-2 text-white">Monthly</h5>
+                    <h3 className="fw-bold mb-2 text-white">R995</h3>
+                    <ul className="list-unstyled text-white small mb-4">
+                      <li className="mb-2">✔ Variable card billing</li>
+                      <li className="mb-2">✔ Usage-based & event-based charging</li>
+                      <li className="mb-2">✔ Billing rules & logic engine</li>
+                      <li className="mb-2">✔ South African card support</li>
+                    </ul>
+
+                    <Button
+                      variant="primary"
+                      size="lg"
+                      className="mt-auto w-100"
+                      onClick={() => {
+                        window.location.href = '/api/billing/activate?plan=monthly';
+                      }}
+                    >
+                      Choose Monthly
+                    </Button>
+                  </CardBody>
+                </Card>
+              </Col>
+
+              <Col md={6}>
+                <Card className="h-100 border border-success text-white">
+                  <CardBody className="d-flex flex-column text-white">
+                    <div className="d-flex align-items-center justify-content-between mb-2">
+                      <h5 className="mb-0 text-white">Annual</h5>
+                      <span className="badge bg-success">Best value</span>
+                    </div>
+
+                    <h3 className="fw-bold mb-2 text-white">R9,950</h3>
+                    <ul className="list-unstyled text-white small mb-4">
+                      <li className="mb-2">✔ Variable card billing</li>
+                      <li className="mb-2">✔ Usage-based & event-based charging</li>
+                      <li className="mb-2">✔ Billing rules & logic engine</li>
+                      <li className="mb-2">✔ South African card support</li>
+                    </ul>
+
+                    <Button
+                      variant="primary"
+                      size="lg"
+                      className="mt-auto w-100"
+                      onClick={() => {
+                        window.location.href = '/api/billing/activate?plan=annual';
+                      }}
+                    >
+                      Choose Annual
+                    </Button>
+                  </CardBody>
+                </Card>
+              </Col>
+            </Row>
+          </Modal.Body>
+        </Modal>
+      </>
     );
   }
 

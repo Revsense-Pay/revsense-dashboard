@@ -1,12 +1,11 @@
 'use client';
 
-import avatar1 from '@/assets/images/users/avatar-1.jpg';
+import avatar1 from '@/assets/images/users/avatar-1.png';
 import IconifyIcon from '@/components/wrapper/IconifyIcon';
 import Image from 'next/image';
 import { signOut } from 'next-auth/react';
 import {
   Dropdown,
-  DropdownHeader,
   DropdownItem,
   DropdownMenu,
   DropdownToggle,
@@ -31,22 +30,13 @@ const ProfileDropdown = () => {
       </DropdownToggle>
 
       <DropdownMenu className="dropdown-menu-end">
-        <DropdownHeader>Welcome!</DropdownHeader>
 
-        <DropdownItem href="/account">
+        <DropdownItem href="/settings">
           <IconifyIcon
             icon="solar:user-outline"
             className="align-middle me-2 fs-18"
           />
           <span className="align-middle">My Account</span>
-        </DropdownItem>
-
-        <DropdownItem href="/onboarding/pricing">
-          <IconifyIcon
-            icon="solar:wallet-outline"
-            className="align-middle me-2 fs-18"
-          />
-          <span className="align-middle">Pricing</span>
         </DropdownItem>
 
         <DropdownItem href="/help">
@@ -55,14 +45,6 @@ const ProfileDropdown = () => {
             className="align-middle me-2 fs-18"
           />
           <span className="align-middle">Help</span>
-        </DropdownItem>
-
-        <DropdownItem href="/auth/lock-screen">
-          <IconifyIcon
-            icon="solar:lock-keyhole-outline"
-            className="align-middle me-2 fs-18"
-          />
-          <span className="align-middle">Lock screen</span>
         </DropdownItem>
 
         <div className="dropdown-divider my-1" />

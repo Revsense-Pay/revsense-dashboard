@@ -7,6 +7,17 @@ import { Button, Modal } from 'react-bootstrap'
 import { Card, CardBody, CardHeader, Row, Col, Table, Spinner } from 'react-bootstrap'
 import { toast } from 'sonner'
 
+type UsagePreviewClient = {
+  accountId: string
+  name: string | null
+  grossCents: number
+  feeCents: number
+  snapshot: null | {
+    id: string
+    status: 'DRAFT' | 'FINALISED' | 'CHARGED'
+  }
+}
+
 async function postAction(url: string, body: any) {
   const res = await fetch(url, {
     method: 'POST',
@@ -41,16 +52,28 @@ export default function AdminUsagePage() {
   const [actionLoading, setActionLoading] = useState(false)
   const [confirm, setConfirm] = useState<{ type: 'finalise' | 'charge'; snapshotId: string } | null>(null)
 
+  const [previewClients, setPreviewClients] = useState<UsagePreviewClient[]>([])
+  const [previewLoading, setPreviewLoading] = useState(true)
+
   useEffect(() => {
     async function load() {
       setLoading(true)
-      const res = await fetch(
-        `/api/admin/usage-snapshots${period ? `?period=${period}` : ''}`
-      )
-      const data = await res.json()
-      setSnapshots(data.snapshots || [])
-      setTotals(data.totals || { grossCents: 0, feeCents: 0 })
+      setPreviewLoading(true)
+
+      const [snapRes, previewRes] = await Promise.all([
+        fetch(`/api/admin/usage-snapshots${period ? `?period=${period}` : ''}`),
+        fetch(`/api/admin/usage-preview${period ? `?period=${period}` : ''}`)
+      ])
+
+      const snapData = await snapRes.json()
+      const previewData = await previewRes.json()
+
+      setSnapshots(snapData.snapshots || [])
+      setTotals(snapData.totals || { grossCents: 0, feeCents: 0 })
+      setPreviewClients(previewData.clients || [])
+
       setLoading(false)
+      setPreviewLoading(false)
     }
     load()
   }, [period])
@@ -141,6 +164,70 @@ export default function AdminUsagePage() {
                   <Spinner size="sm" className="me-2" />
                   Loading usage snapshots…
                 </div>
+              ) : snapshots.length === 0 && previewClients.length > 0 ? (
+                <Table responsive hover className="mb-0 align-middle">
+                  <thead className="text-muted small">
+                    <tr>
+                      <th>Account</th>
+                      <th>Gross (so far)</th>
+                      <th>Usage Fee</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {previewClients.map((c) => (
+                      <tr key={c.accountId}>
+                        <td>
+                          <div className="fw-semibold">
+                            {c.name || 'Unnamed account'}
+                          </div>
+                        </td>
+                        <td>R {(c.grossCents / 100).toFixed(2)}</td>
+                        <td>R {(c.feeCents / 100).toFixed(2)}</td>
+                        <td>
+                          <span className="badge bg-warning text-dark">NOT CREATED</span>
+                        </td>
+                        <td>
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            disabled={actionLoading}
+                            onClick={async () => {
+                              try {
+                                setActionLoading(true)
+                                await postAction('/api/admin/usage-snapshots/create', {
+                                  accountId: c.accountId,
+                                  period,
+                                })
+                                toast.success('Snapshot created')
+
+                                // reload snapshots + preview
+                                const [snapRes, previewRes] = await Promise.all([
+                                  fetch(`/api/admin/usage-snapshots${period ? `?period=${period}` : ''}`),
+                                  fetch(`/api/admin/usage-preview${period ? `?period=${period}` : ''}`)
+                                ])
+
+                                const snapData = await snapRes.json()
+                                const previewData = await previewRes.json()
+
+                                setSnapshots(snapData.snapshots || [])
+                                setTotals(snapData.totals || { grossCents: 0, feeCents: 0 })
+                                setPreviewClients(previewData.clients || [])
+                              } catch (err: any) {
+                                toast.error(err.message || 'Failed to create snapshot')
+                              } finally {
+                                setActionLoading(false)
+                              }
+                            }}
+                          >
+                            Create Snapshot
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
               ) : snapshots.length === 0 ? (
                 <div className="text-center text-muted py-5">
                   No snapshots for this period
