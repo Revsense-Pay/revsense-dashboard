@@ -32,6 +32,11 @@ const ChargeConsolePage = () => {
   const [recentCharges, setRecentCharges] = useState([]);
   const [loadingCharges, setLoadingCharges] = useState(true);
 
+  // New states for gating logic
+  const [billingStatus, setBillingStatus] = useState(null);
+  const [accountStatus, setAccountStatus] = useState(null);
+  const [gateLoading, setGateLoading] = useState(true);
+
   /* ----------------------------------
      Load chargeable clients
   ---------------------------------- */
@@ -67,6 +72,18 @@ const ChargeConsolePage = () => {
     loadRecentCharges();
   }, []);
 
+  // New useEffect to set gating states from session data
+  useEffect(() => {
+    if (sessionStatus === 'loading') {
+      return;
+    }
+    if (session) {
+      setBillingStatus(session.user?.billingStatus || null);
+      setAccountStatus(session.user?.accountStatus || null);
+    }
+    setGateLoading(false);
+  }, [session, sessionStatus]);
+
   const parsedAmount = parseFloat(
     amount.value.replace(/,/g, '')
   );
@@ -79,11 +96,13 @@ const ChargeConsolePage = () => {
 
   const [showBillingModal, setShowBillingModal] = useState(false);
 
-  if (sessionStatus === 'loading') {
+  if (gateLoading) {
     return null;
   }
 
-  if (session?.user?.billingStatus !== 'ACTIVE') {
+  // Remove old gate: if (session?.user?.billingStatus !== 'ACTIVE')
+  // Replace with new gate logic:
+  if (billingStatus !== 'ACTIVE' || accountStatus !== 'ACTIVE') {
     return (
       <>
         <Row>
