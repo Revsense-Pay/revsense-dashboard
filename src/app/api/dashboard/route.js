@@ -25,7 +25,14 @@ export async function GET() {
     const accountId = account.id;
 
     const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const startOfMonth = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)
+    );
+
+    const endOfMonth = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)
+    );
 
     // Charges this month
     const chargesThisMonth = await prisma.charge.findMany({
@@ -34,6 +41,7 @@ export async function GET() {
         status: 'SUCCESS',
         createdAt: {
           gte: startOfMonth,
+          lt: endOfMonth,
         },
       },
       select: {
@@ -56,7 +64,9 @@ export async function GET() {
     // Charges grouped by day
     const chargesByDay = {};
     for (const charge of chargesThisMonth) {
-      const day = charge.createdAt.toISOString().slice(0, 10);
+      const day = new Date(charge.createdAt)
+        .toISOString()
+        .split('T')[0];
       chargesByDay[day] = (chargesByDay[day] || 0) + charge.amount;
     }
 
