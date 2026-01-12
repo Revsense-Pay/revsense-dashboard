@@ -82,36 +82,31 @@ const ChargesChart = ({ data = [] }) => {
   return (
     <Row className="mb-4">
       <Col xl={12}>
-        {safeData.length === 0 ? (
-          <Card>
-            <CardBody>
-              <h5 className="mb-1">Charges Over Time</h5>
-              <small className="text-muted">
+        <Card>
+          <CardBody>
+            <div className="d-flex align-items-center justify-content-between mb-3">
+              <div>
+                <h5 className="mb-1">Charges Over Time</h5>
+                <small className="text-muted">
+                  Total customer charges processed
+                </small>
+              </div>
+            </div>
+
+            {safeData.length === 0 && (
+              <small className="text-muted d-block mb-3">
                 No charges recorded for this month
               </small>
-            </CardBody>
-          </Card>
-        ) : (
-          <Card>
-            <CardBody>
-              <div className="d-flex align-items-center justify-content-between mb-3">
-                <div>
-                  <h5 className="mb-1">Charges Over Time</h5>
-                  <small className="text-muted">
-                    Total customer charges processed
-                  </small>
-                </div>
-              </div>
+            )}
 
-              <Chart
-                options={options}
-                series={series}
-                type="area"
-                height={320}
-              />
-            </CardBody>
-          </Card>
-        )}
+            <Chart
+              options={options}
+              series={series}
+              type="area"
+              height={320}
+            />
+          </CardBody>
+        </Card>
       </Col>
     </Row>
   );
