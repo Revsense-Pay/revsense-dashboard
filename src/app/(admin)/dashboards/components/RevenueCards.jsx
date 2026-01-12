@@ -35,9 +35,9 @@ const RevenueCards = ({ data }) => {
   return (
     <Row className="g-4 mb-4">
       <StatCard
-        key={`revenue-${data?.grossRevenue ?? 0}`}
+        key={`revenue-${data?.grossCents ?? 0}`}
         title="Revenue"
-        value={data?.grossRevenue ?? 0}
+        value={(data?.grossCents ?? 0) / 100}
         subtext="Processed"
         icon="solar:wallet-bold"
         gradient="bg-gradient-primary"
@@ -45,9 +45,9 @@ const RevenueCards = ({ data }) => {
       />
 
       <StatCard
-        key={`fees-${data?.feesCollected ?? 0}`}
+        key={`fees-${data?.feeCents ?? 0}`}
         title="Fees"
-        value={data?.feesCollected ?? 0}
+        value={(data?.feeCents ?? 0) / 100}
         subtext="Your earnings"
         icon="solar:dollar-bold"
         gradient="bg-gradient-success"
@@ -64,9 +64,9 @@ const RevenueCards = ({ data }) => {
       />
 
       <StatCard
-        key={`charges-${data?.totalCharges ?? 0}`}
+        key={`charges-${data?.chargeCount ?? 0}`}
         title="Charges"
-        value={data?.totalCharges ?? 0}
+        value={data?.chargeCount ?? 0}
         subtext="This period"
         icon="solar:card-bold"
         gradient="bg-gradient-warning"

@@ -14,6 +14,8 @@ import Chart from 'react-apexcharts';
 import { useState, useMemo } from 'react';
 
 const ChargesChart = ({ data = [] }) => {
+  // API returns array like:
+  // [{ day: '2026-01-12', grossCents: 30000 }]
   const safeData = Array.isArray(data) ? data : [];
 
   const [range, setRange] = useState('30d');
@@ -22,7 +24,11 @@ const ChargesChart = ({ data = [] }) => {
     () => [
       {
         name: 'Charges (ZAR)',
-        data: safeData.map(item => item.amount),
+        data: safeData.map(item =>
+          typeof item.grossCents === 'number'
+            ? item.grossCents / 100
+            : 0
+        ),
       },
     ],
     [safeData]
