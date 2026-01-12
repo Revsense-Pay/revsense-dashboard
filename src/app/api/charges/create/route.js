@@ -105,8 +105,17 @@ export async function POST(req) {
     // ✅ ALWAYS return JSON on success
     return NextResponse.json({
       success: true,
-      reference,
-      chargeId: charge.id,
+      charge: {
+        id: charge.id,
+        amount: charge.amount,
+        status: charge.status,
+        createdAt: charge.createdAt,
+        client: {
+          id: client.id,
+          name: client.name,
+          email: client.email,
+        },
+      },
     });
 
   } catch (err) {

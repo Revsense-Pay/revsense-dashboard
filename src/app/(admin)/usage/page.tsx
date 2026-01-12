@@ -55,6 +55,17 @@ export default function AdminUsagePage() {
   const [previewClients, setPreviewClients] = useState<UsagePreviewClient[]>([])
   const [previewLoading, setPreviewLoading] = useState(true)
 
+function calculatePreviewTotals(clients: UsagePreviewClient[]) {
+  return clients.reduce(
+    (acc, c) => {
+      acc.grossCents += c.grossCents
+      acc.feeCents += c.feeCents
+      return acc
+    },
+    { grossCents: 0, feeCents: 0 }
+  )
+}
+
   useEffect(() => {
     async function load() {
       setLoading(true)
@@ -69,7 +80,11 @@ export default function AdminUsagePage() {
       const previewData = await previewRes.json()
 
       setSnapshots(snapData.snapshots || [])
-      setTotals(snapData.totals || { grossCents: 0, feeCents: 0 })
+      if (snapData.snapshots && snapData.snapshots.length > 0) {
+        setTotals(snapData.totals || { grossCents: 0, feeCents: 0 })
+      } else {
+        setTotals(calculatePreviewTotals(previewData.clients || []))
+      }
       setPreviewClients(previewData.clients || [])
 
       setLoading(false)
