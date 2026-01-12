@@ -378,6 +378,22 @@ const ChargeConsolePage = () => {
           </Card>
         </Col>
 
+        <Col xl={12}>
+          <Card className="border-0">
+            <CardBody className="bg-transparent px-0">
+              <div className="text-muted small">
+                <strong>Charging tips:</strong>
+                <ul className="mt-2 mb-0">
+                  <li>Avoid charging the same customer multiple times within a short period.</li>
+                  <li>Most businesses charge clients 1–2 times per month with consistent amounts.</li>
+                  <li>Very frequent or rapidly repeated charges may be temporarily blocked by banks.</li>
+                  <li>If a charge is marked <strong>FAILED</strong>, no money was taken.</li>
+                </ul>
+              </div>
+            </CardBody>
+          </Card>
+        </Col>
+
         {/* RECENT CHARGES (placeholder – webhook-backed later) */}
         <Col xl={5}>
           <Card className="h-100">
