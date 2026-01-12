@@ -97,7 +97,7 @@ export async function POST(req) {
         amount,
         currency: 'ZAR',
         source: 'CLIENT',
-        paystackReference: reference,
+        paystackRef: reference,
         status: data.data.status === 'success' ? 'SUCCESS' : 'FAILED',
         description: description ?? null,
       },
