@@ -43,7 +43,7 @@ const RecentCharges = () => {
     fetch('/api/dashboard')
       .then(r => r.json())
       .then(data => {
-        setCharges(data.recentCharges || []);
+        setCharges(data.charges || []);
       })
       .finally(() => setLoading(false));
   }, []);

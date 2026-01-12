@@ -18,17 +18,20 @@ const ChargesChart = ({ data = [] }) => {
   // [{ day: '2026-01-12', grossCents: 30000 }]
   const safeData = Array.isArray(data) ? data : [];
 
+  const getAmount = (item) => {
+    if (typeof item.grossCents === 'number') return item.grossCents;
+    if (typeof item.amountCents === 'number') return item.amountCents;
+    if (typeof item.amount === 'number') return item.amount;
+    return 0;
+  };
+
   const [range, setRange] = useState('30d');
 
   const series = useMemo(
     () => [
       {
         name: 'Charges (ZAR)',
-        data: safeData.map(item =>
-          typeof item.grossCents === 'number'
-            ? item.grossCents / 100
-            : 0
-        ),
+        data: safeData.map(item => getAmount(item) / 100),
       },
     ],
     [safeData]
@@ -56,7 +59,7 @@ const ChargesChart = ({ data = [] }) => {
       colors: ['#ff7a18'],
       dataLabels: { enabled: false },
       xaxis: {
-        categories: safeData.map(item => item.day),
+        categories: safeData.map(item => item.day || item.date || ''),
         labels: {
           style: { colors: '#9ca3af' },
         },
