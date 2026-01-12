@@ -95,8 +95,8 @@ const Page = () => {
       </Row>
 
       <RevenueCards data={dashboardData.summary ?? {}} />
-      <ChargesChart data={dashboardData.chargesOverTime ?? []} />
-      <RecentCharges data={dashboardData.recentCharges ?? []} />
+      <ChargesChart data={dashboardData.chart ?? []} />
+      <RecentCharges data={dashboardData.charges ?? []} />
 
       <Footer />
     </>
