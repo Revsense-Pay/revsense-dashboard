@@ -49,7 +49,7 @@ const RecentCharges = () => {
   }, []);
 
   return (
-    <Card className="h-100">
+    <Card className="h-100 dashboard-card">
       <CardHeader className="d-flex align-items-center justify-content-between">
         <h5 className="mb-0">Recent Charges</h5>
         <span className="text-muted small">Live</span>
