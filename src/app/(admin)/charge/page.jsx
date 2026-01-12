@@ -55,22 +55,29 @@ const ChargeConsolePage = () => {
     loadClients();
   }, []);
 
-  useEffect(() => {
-    async function loadRecentCharges() {
-      try {
-        const res = await fetch('/api/charges/recent');
-        const data = await res.json();
-        setRecentCharges(data.charges || []);
-      } catch {
-        setRecentCharges([]);
-      } finally {
-        setLoadingCharges(false);
-      }
+  async function fetchRecentCharges() {
+    try {
+      const res = await fetch('/api/charges/recent');
+      const data = await res.json();
+      setRecentCharges(data.charges || []);
+    } catch {
+      setRecentCharges([]);
+    } finally {
+      setLoadingCharges(false);
     }
+  }
 
-    loadRecentCharges();
+  useEffect(() => {
+    fetchRecentCharges();
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchRecentCharges();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // New useEffect to set gating states from DB via API
   useEffect(() => {
@@ -250,6 +257,7 @@ const ChargeConsolePage = () => {
       // Optimistic UI update
       if (data.charge) {
         setRecentCharges((prev) => [data.charge, ...prev]);
+        await fetchRecentCharges();
       }
     } catch (err) {
       // ❌ Only show this if the charge never succeeded
@@ -409,7 +417,15 @@ const ChargeConsolePage = () => {
                         <td>{charge.client?.name || charge.client?.email}</td>
                         <td>R {(charge.amount / 100).toFixed(2)}</td>
                         <td>
-                          <span className="badge bg-success">
+                          <span
+                            className={`badge ${
+                              charge.status === 'SUCCESS'
+                                ? 'bg-success'
+                                : charge.status === 'FAILED'
+                                ? 'bg-danger'
+                                : 'bg-warning text-dark'
+                            }`}
+                          >
                             {charge.status}
                           </span>
                         </td>
