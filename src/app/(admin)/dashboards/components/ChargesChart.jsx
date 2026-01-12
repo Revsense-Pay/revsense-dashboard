@@ -7,16 +7,27 @@ import {
   CardBody,
   Col,
   Row,
-  ButtonGroup,
-  Button,
 } from 'react-bootstrap';
 import Chart from 'react-apexcharts';
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 
 const ChargesChart = ({ data = [] }) => {
   // API returns array like:
   // [{ date: '2026-01-12', total: 30000 }]
   const safeData = Array.isArray(data) ? data : [];
+
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth(); // 0-indexed
+
+  const monthData = safeData.filter(item => {
+    if (!item.date) return false;
+    const d = new Date(item.date);
+    return (
+      d.getFullYear() === currentYear &&
+      d.getMonth() === currentMonth
+    );
+  });
 
   const getAmount = (item) => {
     if (typeof item.total === 'number') return item.total; // dashboard API
@@ -26,16 +37,14 @@ const ChargesChart = ({ data = [] }) => {
     return 0;
   };
 
-  const [range, setRange] = useState('30d');
-
   const series = useMemo(
     () => [
       {
         name: 'Charges (ZAR)',
-        data: safeData.map(item => getAmount(item) / 100),
+        data: monthData.map(item => getAmount(item) / 100),
       },
     ],
-    [safeData]
+    [monthData]
   );
 
   const options = useMemo(
@@ -60,7 +69,7 @@ const ChargesChart = ({ data = [] }) => {
       colors: ['#ff7a18'],
       dataLabels: { enabled: false },
       xaxis: {
-        categories: safeData.map(item => item.date || item.day || ''),
+        categories: monthData.map(item => item.date),
         labels: {
           style: { colors: '#9ca3af' },
         },
@@ -80,18 +89,18 @@ const ChargesChart = ({ data = [] }) => {
         },
       },
     }),
-    [safeData]
+    [monthData]
   );
 
   return (
     <Row className="mb-4">
       <Col xl={12}>
-        {safeData.length === 0 ? (
+        {monthData.length === 0 ? (
           <Card>
             <CardBody>
               <h5 className="mb-1">Charges Over Time</h5>
               <small className="text-muted">
-                No charge data for the selected period
+                No charges recorded for this month
               </small>
             </CardBody>
           </Card>
@@ -105,27 +114,6 @@ const ChargesChart = ({ data = [] }) => {
                     Total customer charges processed
                   </small>
                 </div>
-
-                <ButtonGroup size="sm">
-                  <Button
-                    variant={range === '7d' ? 'primary' : 'outline-secondary'}
-                    onClick={() => setRange('7d')}
-                  >
-                    7D
-                  </Button>
-                  <Button
-                    variant={range === '30d' ? 'primary' : 'outline-secondary'}
-                    onClick={() => setRange('30d')}
-                  >
-                    30D
-                  </Button>
-                  <Button
-                    variant={range === '90d' ? 'primary' : 'outline-secondary'}
-                    onClick={() => setRange('90d')}
-                  >
-                    90D
-                  </Button>
-                </ButtonGroup>
               </div>
 
               <Chart
