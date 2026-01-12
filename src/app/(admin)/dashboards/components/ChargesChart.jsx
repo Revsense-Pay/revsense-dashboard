@@ -15,10 +15,11 @@ import { useState, useMemo } from 'react';
 
 const ChargesChart = ({ data = [] }) => {
   // API returns array like:
-  // [{ day: '2026-01-12', grossCents: 30000 }]
+  // [{ date: '2026-01-12', total: 30000 }]
   const safeData = Array.isArray(data) ? data : [];
 
   const getAmount = (item) => {
+    if (typeof item.total === 'number') return item.total; // dashboard API
     if (typeof item.grossCents === 'number') return item.grossCents;
     if (typeof item.amountCents === 'number') return item.amountCents;
     if (typeof item.amount === 'number') return item.amount;
@@ -59,7 +60,7 @@ const ChargesChart = ({ data = [] }) => {
       colors: ['#ff7a18'],
       dataLabels: { enabled: false },
       xaxis: {
-        categories: safeData.map(item => item.day || item.date || ''),
+        categories: safeData.map(item => item.date || item.day || ''),
         labels: {
           style: { colors: '#9ca3af' },
         },
