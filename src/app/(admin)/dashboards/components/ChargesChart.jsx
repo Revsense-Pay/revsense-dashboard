@@ -69,7 +69,7 @@ export default function ChargesChart({ data }) {
   }
 
   return (
-    <div className="card">
+    <div className="card dashboard-card">
       <div className="card-body" style={{ padding: 16 }}>
         <div style={{ width: '100%', height: 260 }}>
           <Chart options={options} series={series} type="area" height={260} />
