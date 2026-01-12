@@ -16,19 +16,6 @@ const ChargesChart = ({ data = [] }) => {
   // [{ date: '2026-01-12', total: 30000 }]
   const safeData = Array.isArray(data) ? data : [];
 
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth(); // 0-indexed
-
-  const monthData = safeData.filter(item => {
-    if (!item.date) return false;
-    const d = new Date(item.date);
-    return (
-      d.getFullYear() === currentYear &&
-      d.getMonth() === currentMonth
-    );
-  });
-
   const getAmount = (item) => {
     if (typeof item.total === 'number') return item.total; // dashboard API
     if (typeof item.grossCents === 'number') return item.grossCents;
@@ -41,10 +28,10 @@ const ChargesChart = ({ data = [] }) => {
     () => [
       {
         name: 'Charges (ZAR)',
-        data: monthData.map(item => getAmount(item) / 100),
+        data: safeData.map(item => getAmount(item) / 100),
       },
     ],
-    [monthData]
+    [safeData]
   );
 
   const options = useMemo(
@@ -69,7 +56,7 @@ const ChargesChart = ({ data = [] }) => {
       colors: ['#ff7a18'],
       dataLabels: { enabled: false },
       xaxis: {
-        categories: monthData.map(item => item.date),
+        categories: safeData.map(item => item.date),
         labels: {
           style: { colors: '#9ca3af' },
         },
@@ -89,13 +76,13 @@ const ChargesChart = ({ data = [] }) => {
         },
       },
     }),
-    [monthData]
+    [safeData]
   );
 
   return (
     <Row className="mb-4">
       <Col xl={12}>
-        {monthData.length === 0 ? (
+        {safeData.length === 0 ? (
           <Card>
             <CardBody>
               <h5 className="mb-1">Charges Over Time</h5>
