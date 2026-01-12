@@ -42,7 +42,7 @@ export async function GET() {
       },
     });
 
-    const revenue = chargesThisMonth.reduce((sum, c) => sum + c.amount, 0);
+    const grossCents = chargesThisMonth.reduce((sum, c) => sum + c.amount, 0);
     const chargeCount = chargesThisMonth.length;
 
     // Active clients
@@ -83,21 +83,17 @@ export async function GET() {
       },
     });
 
-    const fees = Math.round(revenue * 0.01);
+    const feeCents = Math.round(grossCents * 0.01);
 
     return Response.json({
-      grossRevenue: revenue,
-      feesCollected: fees,
-      activeClients,
-      totalCharges: chargeCount,
       summary: {
-        revenue,
-        fees,
+        grossCents,
+        feeCents,
         activeClients,
         chargeCount,
       },
-      chargesOverTime,
-      recentCharges: recentCharges.map(c => ({
+      chart: chargesOverTime,
+      charges: recentCharges.map(c => ({
         id: c.id,
         amount: c.amount,
         currency: c.currency,
