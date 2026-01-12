@@ -33,6 +33,19 @@ export default function ChargesChart({ data }) {
       curve: 'smooth',
       width: 3,
     },
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shade: 'dark',
+        type: 'vertical',
+        shadeIntensity: 0.4,
+        gradientToColors: ['#ff7700'],
+        inverseColors: false,
+        opacityFrom: 0.35,
+        opacityTo: 0.05,
+        stops: [0, 90, 100],
+      },
+    },
     colors: ['#ff7700'],
     grid: {
       borderColor: 'rgba(255,255,255,0.05)',
@@ -56,8 +69,12 @@ export default function ChargesChart({ data }) {
   }
 
   return (
-    <div style={{ width: '100%', height: 260 }}>
-      <Chart options={options} series={series} type="line" height={260} />
+    <div className="card">
+      <div className="card-body" style={{ padding: 16 }}>
+        <div style={{ width: '100%', height: 260 }}>
+          <Chart options={options} series={series} type="area" height={260} />
+        </div>
+      </div>
     </div>
   )
 }
