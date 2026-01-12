@@ -46,6 +46,7 @@
     "react-quill": "^2.0.0",
     "react-select": "^5.8.0",
     "react-toastify": "^10.0.6",
+    "recharts": "^3.6.0",
     "sass": "^1.81.0",
     "simplebar-core": "^1.2.6",
     "simplebar-react": "^3.2.6",
