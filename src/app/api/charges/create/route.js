@@ -96,11 +96,14 @@ export async function POST(req) {
         accountId: client.accountId,
         amount,
         currency: 'ZAR',
+        source: 'CLIENT',
         paystackReference: reference,
         status: data.data.status === 'success' ? 'SUCCESS' : 'FAILED',
         description: description ?? null,
       },
     });
+
+    console.log('CHARGE SAVED', charge.id, charge.amount)
 
     // ✅ ALWAYS return JSON on success
     return NextResponse.json({
