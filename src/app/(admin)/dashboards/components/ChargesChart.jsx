@@ -1,115 +1,63 @@
-'use client';
+import { zonedTimeToUtc, utcToZonedTime } from 'date-fns-tz'
+import { startOfMonth, endOfMonth } from 'date-fns'
 
-export const dynamic = 'force-dynamic';
+import { prisma } from '@/lib/prisma'
 
-import {
-  Card,
-  CardBody,
-  Col,
-  Row,
-} from 'react-bootstrap';
-import Chart from 'react-apexcharts';
-import { useMemo } from 'react';
+export async function GET() {
+  const timeZone = 'Africa/Johannesburg'
 
-const ChargesChart = ({ data = [] }) => {
-  // API returns array like:
-  // [{ date: '2026-01-12', total: 30000 }]
-  const safeData = Array.isArray(data) ? data : [];
+  // Current time in SA
+  const nowZoned = utcToZonedTime(new Date(), timeZone)
 
-  const getAmount = (item) => {
-    if (typeof item.total === 'number') return item.total; // dashboard API
-    if (typeof item.grossCents === 'number') return item.grossCents;
-    if (typeof item.amountCents === 'number') return item.amountCents;
-    if (typeof item.amount === 'number') return item.amount;
-    return 0;
-  };
+  // Month boundaries in SA time, then converted to UTC for DB queries
+  const startOfMonthZoned = startOfMonth(nowZoned)
+  const endOfMonthZoned = endOfMonth(nowZoned)
 
-  const series = useMemo(
-    () => [
-      {
-        name: 'Charges (ZAR)',
-        data: safeData.map(item => getAmount(item) / 100),
-      },
-    ],
-    [safeData]
-  );
+  const startOfMonthUtc = zonedTimeToUtc(startOfMonthZoned, timeZone)
+  const endOfMonthUtc = zonedTimeToUtc(endOfMonthZoned, timeZone)
 
-  const options = useMemo(
-    () => ({
-      chart: {
-        type: 'area',
-        toolbar: { show: false },
-        zoom: { enabled: false },
+  const chargesThisMonth = await prisma.charge.findMany({
+    where: {
+      createdAt: {
+        gte: startOfMonthUtc,
+        lte: endOfMonthUtc,
       },
-      stroke: {
-        curve: 'smooth',
-        width: 3,
+    },
+  })
+
+  // Group charges by day in SA time
+  const chargesByDay = {}
+
+  for (const charge of chargesThisMonth) {
+    const zonedDate = utcToZonedTime(charge.createdAt, timeZone)
+    const day = zonedDate.toISOString().slice(0, 10)
+
+    if (!chargesByDay[day]) {
+      chargesByDay[day] = 0
+    }
+    chargesByDay[day] += charge.amountCents || 0
+  }
+
+  const chargesOverTime = Object.entries(chargesByDay).map(([date, total]) => ({
+    date,
+    total,
+  }))
+
+  chargesOverTime.sort((a, b) => a.date.localeCompare(b.date))
+
+  return new Response(
+    JSON.stringify({
+      summary: {
+        totalCharges: chargesThisMonth.length,
       },
-      fill: {
-        type: 'gradient',
-        gradient: {
-          shadeIntensity: 1,
-          opacityFrom: 0.45,
-          opacityTo: 0.05,
-        },
-      },
-      colors: ['#ff7a18'],
-      dataLabels: { enabled: false },
-      xaxis: {
-        categories: safeData.map(item => item.date),
-        labels: {
-          style: { colors: '#9ca3af' },
-        },
-      },
-      yaxis: {
-        labels: {
-          formatter: val => `R ${val.toLocaleString()}`,
-          style: { colors: '#9ca3af' },
-        },
-      },
-      grid: {
-        borderColor: 'rgba(255,255,255,0.05)',
-      },
-      tooltip: {
-        y: {
-          formatter: val => `R ${val.toLocaleString()}`,
-        },
-      },
+      chart: chargesOverTime,
+      charges: chargesThisMonth,
     }),
-    [safeData]
-  );
-
-  return (
-    <Row className="mb-4">
-      <Col xl={12}>
-        <Card>
-          <CardBody>
-            <div className="d-flex align-items-center justify-content-between mb-3">
-              <div>
-                <h5 className="mb-1">Charges Over Time</h5>
-                <small className="text-muted">
-                  Total customer charges processed
-                </small>
-              </div>
-            </div>
-
-            {safeData.length === 0 && (
-              <small className="text-muted d-block mb-3">
-                No charges recorded for this month
-              </small>
-            )}
-
-            <Chart
-              options={options}
-              series={series}
-              type="area"
-              height={320}
-            />
-          </CardBody>
-        </Card>
-      </Col>
-    </Row>
-  );
-};
-
-export default ChargesChart;
+    {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  )
+}
