@@ -14,7 +14,7 @@ const StatCard = ({ title, value, subtext, icon, gradient, isCurrency }) => {
 
   return (
     <Col xl={3} md={6}>
-      <Card className="h-100 stat-card">
+      <Card className="h-100 stat-card dashboard-card">
         <CardBody className="d-flex align-items-center gap-3">
           <div className={`stat-icon ${gradient}`}>
             <IconifyIcon icon={icon} width={22} />
