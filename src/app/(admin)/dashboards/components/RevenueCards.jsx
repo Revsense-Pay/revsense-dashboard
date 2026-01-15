@@ -48,7 +48,7 @@ const RevenueCards = ({ data }) => {
         key={`fees-${data?.feeCents ?? 0}`}
         title="Fees"
         value={(data?.feeCents ?? 0) / 100}
-        subtext="Your earnings"
+        subtext="Total"
         icon="solar:dollar-bold"
         gradient="bg-gradient-success"
         isCurrency
