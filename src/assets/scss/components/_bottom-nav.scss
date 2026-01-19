@@ -1,0 +1,43 @@
+/* ------------------------------------
+   Bottom Navigation (Mobile Only)
+------------------------------------ */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  height: 64px;
+  background-color: $topbar-bg; // <-- MATCHES TOP BAR
+  border-top: $card-border-width solid $card-border-color;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  z-index: 1005;
+}
+
+/* Nav items */
+.bottom-nav-item {
+  color: $topbar-item-color;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bottom-nav-item.active {
+  opacity: 1;
+  color: $primary;
+}
+
+/* Desktop: hide completely */
+@media (min-width: 601px) {
+  .bottom-nav {
+    display: none;
+  }
+}

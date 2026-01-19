@@ -46,6 +46,7 @@
 @import "components/type";
 @import "components/tooltip";
 @import "components/widgets";
+@import "components/bottom-nav";
 
 
 // Plugin
@@ -399,5 +400,55 @@ html[data-bs-theme='dark'] {
   .wrapper,
   .page-content {
     background-color: #1f252b;
+  }
+}
+
+/* =========================
+   MOBILE NAV OVERRIDES
+   ========================= */
+
+@media (max-width: 768px) {
+
+  /* Hide desktop sidebar on mobile */
+  .leftside-menu,
+  .vertical-menu,
+  .sidebar,
+  .side-nav {
+    display: none !important;
+  }
+
+  /* Remove reserved sidebar spacing */
+  .wrapper,
+  .page-content {
+    margin-left: 0 !important;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+
+  /* Bottom navigation bar */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 72px;
+    background: #0b1220;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 9999;
+  }
+
+  .bottom-nav-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    font-size: 22px;
+    transition: color 0.2s ease;
+  }
+
+  .bottom-nav-item.active {
+    color: #f97316;
   }
 }

@@ -264,3 +264,23 @@ html[data-sidebar-size='sm-hover-active'] {
     }
   }
 }
+
+/* =====================================================
+   MOBILE — HIDE SIDEBAR COMPLETELY
+   ===================================================== */
+
+@media (max-width: 768px) {
+  .app-sidebar {
+    display: none !important;
+  }
+
+  /* Remove left offset caused by sidebar */
+  .page-content {
+    margin-left: 0 !important;
+  }
+
+  /* Topbar should span full width */
+  .app-topbar {
+    left: 0 !important;
+  }
+}

@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { Container } from 'react-bootstrap';
 
 import TopNavigationBar from '@/components/layout/TopNavigationBar/page';
+import BottomNav from '@/components/BottomNav';
 
 const VerticalNavigationBar = dynamic(
   () => import('@/components/layout/VerticalNavigationBar/page'),
@@ -23,6 +24,8 @@ export default async function AdminLayout({ children }) {
         <Container fluid>{children}</Container>
         <Footer />
       </div>
+
+      <BottomNav />
     </div>
   );
 }
