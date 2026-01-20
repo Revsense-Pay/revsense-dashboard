@@ -97,14 +97,7 @@ export default function ClientsPage() {
   }
 
   return (
-    <div
-      className="space-y-4"
-      style={{
-        background: 'var(--page-bg-secondary, #1f252b)',
-        padding: 24,
-        borderRadius: 16,
-      }}
-    >
+    <div className="clients-page space-y-4">
 
       {/* Header */}
       <div className="d-flex justify-content-between align-items-center">
@@ -166,14 +159,13 @@ export default function ClientsPage() {
         </div>
       ) : (
         <div
-          className="rounded-4 mt-4 overflow-hidden"
-          style={{
-            background: 'var(--card-bg)',
-          }}
+          className="rounded-4 mt-4 clients-table-wrapper"
+          style={{ background: 'var(--card-bg)' }}
         >
-          <table
-            className="table table-hover mb-0 align-middle"
-          >
+          <div className="table-responsive">
+            <table
+              className="table table-hover mb-0 align-middle"
+            >
             <thead
               className="text-muted small"
             >
@@ -238,7 +230,8 @@ export default function ClientsPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         </div>
       )}
 

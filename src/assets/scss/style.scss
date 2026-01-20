@@ -408,8 +408,6 @@ html[data-bs-theme='dark'] {
    ========================= */
 
 @media (max-width: 768px) {
-
-  /* Hide desktop sidebar on mobile */
   .leftside-menu,
   .vertical-menu,
   .sidebar,
@@ -417,14 +415,12 @@ html[data-bs-theme='dark'] {
     display: none !important;
   }
 
-  /* Remove reserved sidebar spacing */
   .wrapper,
   .page-content {
     margin-left: 0 !important;
     padding-bottom: calc(72px + env(safe-area-inset-bottom));
   }
 
-  /* Bottom navigation bar */
   .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -452,3 +448,4 @@ html[data-bs-theme='dark'] {
     color: #f97316;
   }
 }
+
