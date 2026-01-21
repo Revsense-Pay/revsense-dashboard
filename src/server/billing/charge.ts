@@ -18,7 +18,7 @@ export async function chargeSnapshot(snapshotId: string) {
     {
       email: snapshot.account.email,
       amount: snapshot.grossCents,
-      authorization_code: snapshot.account.authorizationCode,
+      authorization_code: snapshot.account.billingAuthCode,
     },
     {
       headers: {

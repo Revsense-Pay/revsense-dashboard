@@ -54,6 +54,7 @@ export default function AdminUsagePage() {
 
   const [previewClients, setPreviewClients] = useState<UsagePreviewClient[]>([])
   const [previewLoading, setPreviewLoading] = useState(true)
+  const [billingAuthInputs, setBillingAuthInputs] = useState<Record<string, string>>({})
 
 function calculatePreviewTotals(clients: UsagePreviewClient[]) {
   return clients.reduce(
@@ -204,40 +205,76 @@ function calculatePreviewTotals(clients: UsagePreviewClient[]) {
                           <span className="badge bg-warning text-dark">NOT CREATED</span>
                         </td>
                         <td>
-                          <Button
-                            size="sm"
-                            variant="primary"
-                            disabled={actionLoading}
-                            onClick={async () => {
-                              try {
-                                setActionLoading(true)
-                                await postAction('/api/admin/usage-snapshots/create', {
-                                  accountId: c.accountId,
-                                  period,
-                                })
-                                toast.success('Snapshot created')
-
-                                // reload snapshots + preview
-                                const [snapRes, previewRes] = await Promise.all([
-                                  fetch(`/api/admin/usage-snapshots${period ? `?period=${period}` : ''}`),
-                                  fetch(`/api/admin/usage-preview${period ? `?period=${period}` : ''}`)
-                                ])
-
-                                const snapData = await snapRes.json()
-                                const previewData = await previewRes.json()
-
-                                setSnapshots(snapData.snapshots || [])
-                                setTotals(snapData.totals || { grossCents: 0, feeCents: 0 })
-                                setPreviewClients(previewData.clients || [])
-                              } catch (err: any) {
-                                toast.error(err.message || 'Failed to create snapshot')
-                              } finally {
-                                setActionLoading(false)
+                          <div className="d-flex flex-column gap-2">
+                            <input
+                              type="text"
+                              className="form-control form-control-sm"
+                              placeholder="Paste Paystack billing auth code"
+                              value={billingAuthInputs[c.accountId] || ''}
+                              onChange={(e) =>
+                                setBillingAuthInputs(prev => ({
+                                  ...prev,
+                                  [c.accountId]: e.target.value,
+                                }))
                               }
-                            }}
-                          >
-                            Create Snapshot
-                          </Button>
+                            />
+
+                            <Button
+                              size="sm"
+                              variant="outline-primary"
+                              disabled={actionLoading || !billingAuthInputs[c.accountId]}
+                              onClick={async () => {
+                                try {
+                                  setActionLoading(true)
+                                  await postAction('/api/admin/accounts/set-billing-auth', {
+                                    accountId: c.accountId,
+                                    authorizationCode: billingAuthInputs[c.accountId],
+                                  })
+                                  toast.success('Billing authorization saved')
+                                } catch (err: any) {
+                                  toast.error(err.message || 'Failed to save auth code')
+                                } finally {
+                                  setActionLoading(false)
+                                }
+                              }}
+                            >
+                              Save Billing Auth
+                            </Button>
+
+                            <Button
+                              size="sm"
+                              variant="primary"
+                              disabled={actionLoading}
+                              onClick={async () => {
+                                try {
+                                  setActionLoading(true)
+                                  await postAction('/api/admin/usage-snapshots/create', {
+                                    accountId: c.accountId,
+                                    period,
+                                  })
+                                  toast.success('Snapshot created')
+
+                                  const [snapRes, previewRes] = await Promise.all([
+                                    fetch(`/api/admin/usage-snapshots${period ? `?period=${period}` : ''}`),
+                                    fetch(`/api/admin/usage-preview${period ? `?period=${period}` : ''}`)
+                                  ])
+
+                                  const snapData = await snapRes.json()
+                                  const previewData = await previewRes.json()
+
+                                  setSnapshots(snapData.snapshots || [])
+                                  setTotals(snapData.totals || { grossCents: 0, feeCents: 0 })
+                                  setPreviewClients(previewData.clients || [])
+                                } catch (err: any) {
+                                  toast.error(err.message || 'Failed to create snapshot')
+                                } finally {
+                                  setActionLoading(false)
+                                }
+                              }}
+                            >
+                              Create Snapshot
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -263,10 +300,10 @@ function calculatePreviewTotals(clients: UsagePreviewClient[]) {
                       <tr key={s.id}>
                         <td>
                           <div>
-                            {s.account.companyName ?? '—'}
+                            {s.account?.companyName || '—'}
                           </div>
                           <small className="text-muted">
-                            {s.account.email}
+                            {s.account?.email || ''}
                           </small>
                         </td>
                         <td>

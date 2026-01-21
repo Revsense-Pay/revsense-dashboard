@@ -1,10 +1,30 @@
 import { prisma } from '@/lib/prisma'
 
 export async function listSnapshots(period: string) {
-  return prisma.usageSnapshot.findMany({
+  const snapshots = await prisma.usageSnapshot.findMany({
     where: { period },
+    include: {
+      account: {
+        select: {
+          id: true,
+          email: true,
+          companyName: true,
+        },
+      },
+    },
     orderBy: { createdAt: 'asc' },
   })
+
+  const totals = snapshots.reduce(
+    (acc, s) => {
+      acc.grossCents += s.grossCents
+      acc.feeCents += s.feeCents
+      return acc
+    },
+    { grossCents: 0, feeCents: 0 }
+  )
+
+  return { snapshots, totals }
 }
 
 export async function finaliseSnapshot(snapshotId: string) {
@@ -19,7 +39,6 @@ export async function finaliseSnapshot(snapshotId: string) {
     where: { id: snapshotId },
     data: {
       status: 'FINALISED',
-      finalisedAt: new Date(),
     },
   })
 }

@@ -6,15 +6,14 @@ export async function finaliseSnapshot(snapshotId: string) {
   })
 
   if (!snapshot) throw new Error('Snapshot not found')
-  if (snapshot.status !== 'DRAFT') throw new Error('Invalid state')
+  if (snapshot.status !== 'DRAFT') {
+    throw new Error('Invalid state: snapshot cannot be finalised')
+  }
 
   return prisma.usageSnapshot.update({
     where: { id: snapshotId },
     data: {
       status: 'FINALISED',
-      finalisedAt: new Date(),
     },
   })
 }
-
-export {}

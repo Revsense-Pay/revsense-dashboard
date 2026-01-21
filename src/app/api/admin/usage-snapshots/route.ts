@@ -18,9 +18,9 @@ export async function GET(req: Request) {
       searchParams.get('period') ??
       format(startOfMonth(new Date()), 'yyyy-MM')
 
-    const snapshots = await listSnapshots(period)
+    const { snapshots, totals } = await listSnapshots(period)
 
-    return NextResponse.json({ period, snapshots })
+    return NextResponse.json({ period, snapshots, totals })
   } catch (err) {
     console.error('ADMIN USAGE SNAPSHOTS ERROR', err)
     return NextResponse.json(
