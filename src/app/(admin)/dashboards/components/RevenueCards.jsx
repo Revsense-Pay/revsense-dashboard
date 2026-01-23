@@ -6,6 +6,9 @@ import { useCountUp } from '@/hooks/useCountUp';
 import { Card, CardBody, Col, Row } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrapper/IconifyIcon';
 
+// Paystack fee constant (2.9%)
+const PAYSTACK_FEE_PERCENT = 0.029;
+
 const StatCard = ({ title, value, subtext, icon, gradient, isCurrency }) => {
   const animatedValue = useCountUp(value, {
     formatter: val =>
@@ -34,6 +37,7 @@ const StatCard = ({ title, value, subtext, icon, gradient, isCurrency }) => {
 const RevenueCards = ({ data }) => {
   return (
     <Row className="g-4 mb-4">
+      {/* Revenue — unchanged */}
       <StatCard
         key={`revenue-${data?.grossCents ?? 0}`}
         title="Revenue"
@@ -44,16 +48,18 @@ const RevenueCards = ({ data }) => {
         isCurrency
       />
 
+      {/* Paystack Fees — derived at 2.9% */}
       <StatCard
-        key={`fees-${data?.feeCents ?? 0}`}
-        title="Fees"
-        value={(data?.feeCents ?? 0) / 100}
-        subtext="Total"
+        key={`paystack-fees-${data?.grossCents ?? 0}`}
+        title="Paystack Fees"
+        value={((data?.grossCents ?? 0) * PAYSTACK_FEE_PERCENT) / 100}
+        subtext="Estimated (2.9%)"
         icon="solar:dollar-bold"
         gradient="bg-gradient-success"
         isCurrency
       />
 
+      {/* Active clients — unchanged */}
       <StatCard
         key={`clients-${data?.activeClients ?? 0}`}
         title="Active Clients"
@@ -63,6 +69,7 @@ const RevenueCards = ({ data }) => {
         gradient="bg-gradient-info"
       />
 
+      {/* Charges — unchanged */}
       <StatCard
         key={`charges-${data?.chargeCount ?? 0}`}
         title="Charges"
