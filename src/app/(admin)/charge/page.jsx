@@ -158,7 +158,7 @@ const ChargeConsolePage = () => {
                 <Card className="h-100 border border-warning text-white">
                   <CardBody className="d-flex flex-column text-white">
                     <h5 className="mb-2 text-white">Monthly</h5>
-                    <h3 className="fw-bold mb-2 text-white">R995</h3>
+                    <h3 className="fw-bold mb-2 text-white">R2450</h3>
                     <ul className="list-unstyled text-white small mb-4">
                       <li className="mb-2">✔ Variable card billing</li>
                       <li className="mb-2">✔ Usage-based & event-based charging</li>
@@ -188,7 +188,7 @@ const ChargeConsolePage = () => {
                       <span className="badge bg-success">Best value</span>
                     </div>
 
-                    <h3 className="fw-bold mb-2 text-white">R9,950</h3>
+                    <h3 className="fw-bold mb-2 text-white">R24,500</h3>
                     <ul className="list-unstyled text-white small mb-4">
                       <li className="mb-2">✔ Variable card billing</li>
                       <li className="mb-2">✔ Usage-based & event-based charging</li>
